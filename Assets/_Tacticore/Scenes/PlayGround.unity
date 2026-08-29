@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 242055842}
   - component: {fileID: 242055843}
   - component: {fileID: 242055844}
+  - component: {fileID: 242055845}
   m_Layer: 0
   m_Name: OperatorInput
   m_TagString: Untagged
@@ -170,6 +171,7 @@ MonoBehaviour:
   navigation: {fileID: 2093554710}
   sampleSpacing: 0.2
   clearanceStep: 0.2
+  clickThreshold: 0.25
   strokeColor: {r: 1, g: 1, b: 1, a: 0.55}
   dashDensity: 4
   strokeSmoothing: 6
@@ -213,6 +215,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fea3894ae7330d7419c9f60a102e9956, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Input::PauseInput
+--- !u!114 &242055845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242055839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eca36879f8fa7894ea10005f43e533cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.UI::OperatorActionMenu
+  pointer: {fileID: 242055842}
+  pathInput: {fileID: 242055841}
+  view: {fileID: 519420031}
+  panelSize: {x: 148, y: 66}
+  gapAboveOperator: 22
+  padding: 6
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
