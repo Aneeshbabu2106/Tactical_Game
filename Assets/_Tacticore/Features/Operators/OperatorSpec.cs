@@ -14,8 +14,11 @@ public class OperatorSpec : ScriptableObject
     public string displayName = "ASSAULT";
 
     [Header("Movement")]
-    [Tooltip("World units per second.")]
-    public float moveSpeed = 2.6f;
+    [Tooltip("World units per second at walking pace.")]
+    public float walkSpeed = 2.6f;
+
+    [Tooltip("World units per second when running.")]
+    public float runSpeed = 4.4f;
 
     [Tooltip("Degrees per second the facing can swing.")]
     public float turnRate = 360f;

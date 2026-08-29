@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -17,6 +18,9 @@ public class OperatorPathInput : MonoBehaviour
     [Tooltip("Spacing of the walkability samples taken along each new segment.")]
     [SerializeField] private float clearanceStep = 0.2f;
 
+    [Tooltip("A press that moves less than this is a click, not a path.")]
+    [SerializeField] private float clickThreshold = 0.25f;
+
     [SerializeField] private Color strokeColor = Color.white;
 
     [Tooltip("Dash cycles per world unit along the stroke.")]
@@ -27,10 +31,15 @@ public class OperatorPathInput : MonoBehaviour
     [SerializeField] private int strokeSmoothing = 6;
     [SerializeField] private LineRenderer strokeLine;
 
+    /// <summary>Raised on a left-click that was not a drag. The action menu listens for this.</summary>
+    public event Action<Operator> Clicked;
+
     private readonly List<Vector3> stroke = new();
     private readonly List<Vector3> smoothBuffer = new();
     private Operator drawing;
     private float strokeZ;
+    private Vector3 pressedAt;
+    private bool dragged;
 
     private void Awake()
     {
@@ -74,10 +83,14 @@ public class OperatorPathInput : MonoBehaviour
             return;
         }
 
-        drawing.ClearPath();
+        // Not cleared here: this press may turn out to be a click, and a click must leave the
+        // existing path alone. The clear happens once the gesture commits to being a drag.
 
         // Keep the whole stroke in the operator's own plane; sprite z varies for sorting.
         strokeZ = drawing.transform.position.z;
+
+        pressedAt = cursor;
+        dragged = false;
 
         stroke.Clear();
         stroke.Add(drawing.transform.position);
@@ -91,6 +104,18 @@ public class OperatorPathInput : MonoBehaviour
     /// </summary>
     private void ExtendStroke(Vector3 cursor)
     {
+        if (!dragged)
+        {
+            if (Vector3.Distance(cursor, pressedAt) < clickThreshold)
+            {
+                return;
+            }
+
+            // Past the threshold once, stay a drag for the rest of the gesture.
+            dragged = true;
+            drawing.ClearPath();
+        }
+
         var last = stroke[stroke.Count - 1];
 
         if (Vector3.Distance(cursor, last) < sampleSpacing)
@@ -109,10 +134,14 @@ public class OperatorPathInput : MonoBehaviour
 
     private void CommitStroke()
     {
-        // The first point is the operator's own position, so a stroke of one is just a click.
-        if (stroke.Count > 1)
+        if (dragged && stroke.Count > 1)
         {
+            // The first point is the operator's own position, not somewhere to walk to.
             drawing.SetPath(stroke.GetRange(1, stroke.Count - 1));
+        }
+        else
+        {
+            Clicked?.Invoke(drawing);
         }
 
         drawing = null;

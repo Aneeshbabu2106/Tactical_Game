@@ -1,0 +1,17 @@
+{
+    "name": "Tacticore.UI",
+    "rootNamespace": "",
+    "references": [
+        "Tacticore.Operators",
+        "Tacticore.Input"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

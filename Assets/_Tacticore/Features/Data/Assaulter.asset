@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Assaulter
   m_EditorClassIdentifier: Tacticore.Operators::OperatorSpec
   displayName: ASSAULT
-  moveSpeed: 2.6
+  walkSpeed: 2.6
+  runSpeed: 4.4
   turnRate: 360
   pickRadius: 0.45
   lookLength: 0.95

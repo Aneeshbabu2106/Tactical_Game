@@ -34,6 +34,24 @@ public class Operator : MonoBehaviour
 
     public bool IsMoving => motor != null && motor.IsMoving;
 
+    /// <summary>Pace toggle. Applies immediately, mid-path included.</summary>
+    public bool IsRunning { get; private set; }
+
+    public void SetRunning(bool running)
+    {
+        IsRunning = running;
+
+        if (motor != null && spec != null)
+        {
+            motor.MoveSpeed = running ? spec.runSpeed : spec.walkSpeed;
+        }
+    }
+
+    public void ToggleRunning()
+    {
+        SetRunning(!IsRunning);
+    }
+
     private void Awake()
     {
         if (spec == null)
@@ -46,7 +64,7 @@ public class Operator : MonoBehaviour
 
         motor = new OperatorMotor(transform.position)
         {
-            MoveSpeed = spec.moveSpeed,
+            MoveSpeed = spec.walkSpeed,
             TurnRate = spec.turnRate
         };
 
