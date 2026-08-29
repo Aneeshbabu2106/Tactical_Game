@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 242055841}
   - component: {fileID: 242055842}
   - component: {fileID: 242055843}
+  - component: {fileID: 242055844}
   m_Layer: 0
   m_Name: OperatorInput
   m_TagString: Untagged
@@ -198,6 +199,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Tacticore.Operators::OperatorLookInput
   pointer: {fileID: 242055842}
   clickThreshold: 0.25
+--- !u!114 &242055844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242055839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fea3894ae7330d7419c9f60a102e9956, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Input::PauseInput
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,6 +223,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -335,6 +349,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f83f0b2915fee946b26089d64b3ad39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Camera::MapCamera
+  view: {fileID: 519420031}
+  pointer: {fileID: 242055842}
+  bounds: {fileID: 2093554710}
+  minSize: 4
+  maxSize: 12
+  sizePerNotch: 15
+  smoothing: 14
+  zoomTowardsCursor: 1
+  panEnabled: 1
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
