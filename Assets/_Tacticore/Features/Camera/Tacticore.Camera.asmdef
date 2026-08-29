@@ -1,0 +1,16 @@
+{
+    "name": "Tacticore.Camera",
+    "rootNamespace": "",
+    "references": [
+        "Tacticore.Input"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
