@@ -52,7 +52,8 @@ public class Operator : MonoBehaviour
 
     private void Update()
     {
-        motor.Tick(Time.deltaTime);
+        // SimClock, not Time: paused feeds zero so the operator holds while the player plans.
+        motor.Tick(SimClock.DeltaTime);
         ApplyMotorState();
         RedrawPath();
         RedrawLookMarker();

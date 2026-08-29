@@ -1,10 +1,7 @@
 {
-    "name": "Tacticore.Input",
+    "name": "Tacticore.Core",
     "rootNamespace": "",
-    "references": [
-        "Tacticore.Core",
-        "Unity.InputSystem"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
