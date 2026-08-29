@@ -12,15 +12,23 @@ public class OperatorPathInput : MonoBehaviour
     [SerializeField] private Tilemap navigation;
 
     [Tooltip("Distance the cursor must travel before another point is added to the stroke.")]
-    [SerializeField] private float sampleSpacing = 0.35f;
+    [SerializeField] private float sampleSpacing = 0.0875f;
 
     [Tooltip("Spacing of the walkability samples taken along each new segment.")]
     [SerializeField] private float clearanceStep = 0.2f;
 
-    [SerializeField] private Color strokeColor = new(1f, 1f, 1f, 0.55f);
+    [SerializeField] private Color strokeColor = Color.white;
+
+    [Tooltip("Dash cycles per world unit along the stroke.")]
+    [SerializeField] private float dashDensity = 4f;
+
+    [Tooltip("Curve samples per drawn segment. 1 draws the raw polyline.")]
+    [Range(1, 12)]
+    [SerializeField] private int strokeSmoothing = 6;
     [SerializeField] private LineRenderer strokeLine;
 
     private readonly List<Vector3> stroke = new();
+    private readonly List<Vector3> smoothBuffer = new();
     private Operator drawing;
     private float strokeZ;
 
@@ -137,11 +145,13 @@ public class OperatorPathInput : MonoBehaviour
             return;
         }
 
-        strokeLine.positionCount = stroke.Count;
+        PathSmoothing.Smooth(stroke, smoothBuffer, strokeSmoothing);
 
-        for (var i = 0; i < stroke.Count; i++)
+        strokeLine.positionCount = smoothBuffer.Count;
+
+        for (var i = 0; i < smoothBuffer.Count; i++)
         {
-            strokeLine.SetPosition(i, stroke[i]);
+            strokeLine.SetPosition(i, smoothBuffer[i]);
         }
     }
 
@@ -160,7 +170,14 @@ public class OperatorPathInput : MonoBehaviour
         strokeLine.widthMultiplier = 0.06f;
         strokeLine.numCapVertices = 4;
         strokeLine.positionCount = 0;
-        strokeLine.material = new Material(Shader.Find("Sprites/Default"));
+        // Dashes come from a tiled on/off texture; LineRenderer has no dash mode.
+        strokeLine.textureMode = LineTextureMode.Tile;
+        strokeLine.material = new Material(Shader.Find("Sprites/Default"))
+        {
+            mainTexture = LineArt.Dash(),
+            mainTextureScale = new Vector2(dashDensity, 1f)
+        };
+
         strokeLine.startColor = strokeColor;
         strokeLine.endColor = strokeColor;
         strokeLine.sortingOrder = 99;

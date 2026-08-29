@@ -18,6 +18,12 @@ public class Operator : MonoBehaviour
     private OperatorMotor motor;
     private Transform rig;
 
+    // Reused every frame; smoothing a path per frame would otherwise churn the heap.
+    private readonly List<Vector3> pathBuffer = new();
+    private readonly List<Vector3> smoothBuffer = new();
+    private readonly List<SpriteRenderer> dots = new();
+    private Transform dotRoot;
+
     public OperatorMotor Motor => motor;
 
     public float FacingDegrees => motor?.FacingDegrees ?? 0f;
@@ -104,18 +110,93 @@ public class Operator : MonoBehaviour
         if (motor.RemainingCount == 0)
         {
             pathLine.positionCount = 0;
+            RedrawDots(null);
             return;
         }
 
-        pathLine.positionCount = motor.RemainingCount + 1;
-        pathLine.SetPosition(0, transform.position);
+        // Start from where the operator actually is, so the curve stays attached as it walks.
+        pathBuffer.Clear();
+        pathBuffer.Add(transform.position);
+        pathBuffer.AddRange(motor.Remaining);
 
-        var i = 1;
+        PathSmoothing.Smooth(pathBuffer, smoothBuffer, spec.pathSmoothing);
 
-        foreach (var point in motor.Remaining)
+        pathLine.positionCount = smoothBuffer.Count;
+
+        for (var i = 0; i < smoothBuffer.Count; i++)
         {
-            pathLine.SetPosition(i++, point);
+            pathLine.SetPosition(i, smoothBuffer[i]);
         }
+
+        RedrawDots(smoothBuffer);
+    }
+
+    /// <summary>
+    ///     Marks the path at a fixed distance cadence, the way the prototype dots each waypoint.
+    ///     Ours is a freehand stroke with no waypoints of its own, so the spacing supplies the rhythm.
+    ///     Renderers are pooled and hidden rather than destroyed; a walking path redraws every frame.
+    /// </summary>
+    private void RedrawDots(List<Vector3> curve)
+    {
+        var used = 0;
+
+        if (curve != null && curve.Count > 1 && spec.pathMarkerSpacing > 0f)
+        {
+            var carried = 0f;
+
+            for (var i = 1; i < curve.Count; i++)
+            {
+                var from = curve[i - 1];
+                var to = curve[i];
+                var segment = Vector3.Distance(from, to);
+
+                if (segment <= 0f)
+                {
+                    continue;
+                }
+
+                // Carry the remainder across segments so spacing stays even, not per-segment.
+                var travelled = spec.pathMarkerSpacing - carried;
+                var heading = (to - from) / segment;
+
+                while (travelled <= segment)
+                {
+                    PlaceMarker(used++, Vector3.Lerp(from, to, travelled / segment), heading);
+                    travelled += spec.pathMarkerSpacing;
+                }
+
+                carried = segment - (travelled - spec.pathMarkerSpacing);
+            }
+        }
+
+        for (var i = used; i < dots.Count; i++)
+        {
+            dots[i].enabled = false;
+        }
+    }
+
+    private void PlaceMarker(int index, Vector3 position, Vector3 heading)
+    {
+        while (dots.Count <= index)
+        {
+            var host = new GameObject("Arrow");
+            host.transform.SetParent(dotRoot, false);
+
+            var renderer = host.AddComponent<SpriteRenderer>();
+            renderer.sprite = LineArt.Arrow();
+            renderer.sortingOrder = 100;
+            dots.Add(renderer);
+        }
+
+        var marker = dots[index];
+        marker.enabled = true;
+        marker.color = spec.pathColor;
+        marker.transform.position = position;
+        marker.transform.localScale = Vector3.one * spec.pathMarkerSize;
+
+        // The sprite points along +X, so align its right axis with the direction of travel.
+        marker.transform.rotation =
+            Quaternion.Euler(0f, 0f, Mathf.Atan2(heading.y, heading.x) * Mathf.Rad2Deg);
     }
 
     /// <summary>
@@ -228,6 +309,9 @@ public class Operator : MonoBehaviour
         pathLine.startColor = spec.pathColor;
         pathLine.endColor = spec.pathColor;
         pathLine.sortingOrder = 100;
+
+        dotRoot = new GameObject("PathArrows").transform;
+        dotRoot.SetParent(transform, false);
     }
 
     /// <summary>

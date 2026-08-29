@@ -18,7 +18,12 @@ MonoBehaviour:
   pickRadius: 0.45
   lookLength: 0.95
   lookColor: {r: 0.06, g: 0.06, b: 0.08, a: 0.9}
-  pathColor: {r: 0.5, g: 0.85, b: 1, a: 0.7}
+  lookMarkerColor: {r: 1, g: 0.72, b: 0.27, a: 0.85}
+  lookMarkerSize: 0.16
+  pathColor: {r: 0.498, g: 0.831, b: 1, a: 1}
+  pathMarkerSpacing: 2.2
+  pathMarkerSize: 0.28
+  pathSmoothing: 6
   gunSprite: {fileID: 0}
   gunOffset: {x: 0.16, y: -0.14}
   gunSize: {x: 0.52, y: 0.1}

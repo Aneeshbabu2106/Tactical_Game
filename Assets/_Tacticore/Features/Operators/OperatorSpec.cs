@@ -33,7 +33,17 @@ public class OperatorSpec : ScriptableObject
     public float lookMarkerSize = 0.16f;
 
     [Header("Path")]
-    public Color pathColor = new(0.5f, 0.85f, 1f, 0.7f);
+    [Tooltip("The class colour. #7fd4ff is the prototype's assaulter.")]
+    public Color pathColor = new(0.498f, 0.831f, 1f, 1f);
+
+    [Tooltip("Distance between direction arrows along the path.")]
+    public float pathMarkerSpacing = 2.2f;
+
+    public float pathMarkerSize = 0.28f;
+
+    [Tooltip("Curve samples per drawn segment. 1 draws the raw polyline.")]
+    [Range(1, 12)]
+    public int pathSmoothing = 6;
 
     [Header("Gun placeholder")]
     [Tooltip("Leave empty for a generated white bar.")]
