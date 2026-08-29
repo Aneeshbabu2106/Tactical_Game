@@ -168,9 +168,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Tacticore.Operators::OperatorPathInput
   pointer: {fileID: 242055842}
   navigation: {fileID: 2093554710}
-  sampleSpacing: 0.35
+  sampleSpacing: 0.2
   clearanceStep: 0.2
   strokeColor: {r: 1, g: 1, b: 1, a: 0.55}
+  dashDensity: 4
+  strokeSmoothing: 6
   strokeLine: {fileID: 0}
 --- !u!114 &242055842
 MonoBehaviour:
