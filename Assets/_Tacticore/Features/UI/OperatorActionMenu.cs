@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -15,6 +17,7 @@ public class OperatorActionMenu : MonoBehaviour
 {
     [SerializeField] private PointerInput pointer;
     [SerializeField] private OperatorPathInput pathInput;
+    [SerializeField] private WaypointInput waypointInput;
     [SerializeField] private Camera view;
 
     [Header("Layout, in pixels")]
@@ -22,10 +25,26 @@ public class OperatorActionMenu : MonoBehaviour
     [SerializeField] private float gapAboveOperator = 22f;
     [SerializeField] private float padding = 6f;
 
+    private readonly List<Row> rows = new();
+    private readonly List<Rect> rowRects = new();
+
     private Operator target;
+    private Waypoint waypoint;
     private Rect panel;
-    private Rect speedButton;
-    private Rect clearButton;
+
+    private readonly struct Row
+    {
+        public Row(string label, bool enabled, Action action)
+        {
+            Label = label;
+            Enabled = enabled;
+            Action = action;
+        }
+
+        public string Label { get; }
+        public bool Enabled { get; }
+        public Action Action { get; }
+    }
 
     public bool IsOpen => target != null;
 
@@ -41,6 +60,13 @@ public class OperatorActionMenu : MonoBehaviour
             pathInput = FindFirstObjectByType<OperatorPathInput>();
         }
 
+        if (waypointInput == null)
+        {
+            waypointInput = FindFirstObjectByType<WaypointInput>();
+        }
+
+
+
         if (view == null)
         {
             view = Camera.main;
@@ -51,16 +77,30 @@ public class OperatorActionMenu : MonoBehaviour
     {
         if (pathInput != null)
         {
-            pathInput.Clicked += Open;
+            pathInput.Clicked += OpenForOperator;
         }
+
+        if (waypointInput != null)
+        {
+            waypointInput.WaypointClicked += OpenForWaypoint;
+        }
+
+
     }
 
     private void OnDisable()
     {
         if (pathInput != null)
         {
-            pathInput.Clicked -= Open;
+            pathInput.Clicked -= OpenForOperator;
         }
+
+        if (waypointInput != null)
+        {
+            waypointInput.WaypointClicked -= OpenForWaypoint;
+        }
+
+
     }
 
     private void Update()
@@ -87,17 +127,17 @@ public class OperatorActionMenu : MonoBehaviour
         var click = GuiPoint(pointer.ScreenPosition);
         var insidePanel = panel.Contains(click);
 
-        // Left only activates a row. The panel sits just above the operator, so a right-click
-        // aimed at the operator can land on it, and that gesture belongs to the operator.
+        // Left only activates a row. The panel sits just above its anchor, so a right-click aimed
+        // at the operator or waypoint can land on it, and that gesture belongs to the target.
         if (pointer.Pressed && insidePanel)
         {
-            if (speedButton.Contains(click))
+            for (var i = 0; i < rows.Count && i < rowRects.Count; i++)
             {
-                target.ToggleRunning();
-            }
-            else if (clearButton.Contains(click) && target.IsMoving)
-            {
-                target.ClearPath();
+                if (rows[i].Enabled && rowRects[i].Contains(click))
+                {
+                    rows[i].Action();
+                    break;
+                }
             }
 
             return;
@@ -118,34 +158,84 @@ public class OperatorActionMenu : MonoBehaviour
 
         GUI.Box(panel, GUIContent.none);
 
-        DrawButton(speedButton, target.IsRunning ? "RUN" : "WALK", true);
-        DrawButton(clearButton, "CLEAR PATH", target.IsMoving);
+        for (var i = 0; i < rows.Count && i < rowRects.Count; i++)
+        {
+            DrawButton(rowRects[i], rows[i].Label, rows[i].Enabled);
+        }
     }
 
-    public void Open(Operator op)
+    public void OpenForOperator(Operator op)
     {
         target = op;
+        waypoint = null;
+    }
+
+    public void OpenForWaypoint(Operator op, Waypoint wp)
+    {
+        target = op;
+        waypoint = wp;
     }
 
     public void Close()
     {
         target = null;
+        waypoint = null;
+    }
+
+    /// <summary>
+    ///     Rebuilt every frame so labels and enabled state track the thing the menu is open on,
+    ///     rather than freezing at the moment it opened.
+    /// </summary>
+    private void BuildRows()
+    {
+        rows.Clear();
+
+        if (waypoint != null)
+        {
+            rows.Add(new Row(waypoint.Run ? "RUN" : "WALK", true, () => waypoint.Run = !waypoint.Run));
+            rows.Add(new Row("CANCEL WAYPOINT", true, () =>
+            {
+                target.Plan.Remove(waypoint);
+                target.PathChanged();
+                Close();
+            }));
+
+            return;
+        }
+
+        rows.Add(new Row(target.IsRunning ? "RUN" : "WALK", true, target.ToggleRunning));
+        rows.Add(new Row("CLEAR PATH", target.IsMoving, target.ClearPath));
     }
 
     private void Layout()
     {
-        var screen = view.WorldToScreenPoint(target.transform.position);
+        BuildRows();
+
+        var anchor = waypoint != null && waypoint.PointIndex < target.Plan.Points.Count
+            ? target.Plan.Points[waypoint.PointIndex]
+            : target.transform.position;
+
+        var screen = view.WorldToScreenPoint(anchor);
 
         // IMGUI measures y downward from the top; screen space measures it upward from the bottom.
         var top = Screen.height - screen.y - gapAboveOperator - panelSize.y;
 
         panel = new Rect(screen.x - panelSize.x * 0.5f, top, panelSize.x, panelSize.y);
 
-        var rowHeight = (panelSize.y - padding * 3f) * 0.5f;
+        var count = Mathf.Max(1, rows.Count);
+        var rowHeight = (panelSize.y - padding * (count + 1)) / count;
         var width = panelSize.x - padding * 2f;
 
-        speedButton = new Rect(panel.x + padding, panel.y + padding, width, rowHeight);
-        clearButton = new Rect(panel.x + padding, speedButton.yMax + padding, width, rowHeight);
+        rowRects.Clear();
+
+        for (var i = 0; i < count; i++)
+        {
+            rowRects.Add(new Rect(
+                panel.x + padding,
+                panel.y + padding + i * (rowHeight + padding),
+                width,
+                rowHeight));
+        }
     }
 
     private void DrawButton(Rect rect, string label, bool enabled)
@@ -163,3 +253,4 @@ public class OperatorActionMenu : MonoBehaviour
         return new Vector2(screenPosition.x, Screen.height - screenPosition.y);
     }
 }
+

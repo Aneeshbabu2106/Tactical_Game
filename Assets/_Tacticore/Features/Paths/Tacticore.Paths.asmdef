@@ -1,13 +1,7 @@
 {
-    "name": "Tacticore.UI",
+    "name": "Tacticore.Paths",
     "rootNamespace": "",
-    "references": [
-        "Tacticore.Core",
-        "Tacticore.Paths",
-        "Tacticore.Operators",
-        "Tacticore.Tools",
-        "Tacticore.Input"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

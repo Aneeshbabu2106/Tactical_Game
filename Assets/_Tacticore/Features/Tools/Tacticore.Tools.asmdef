@@ -1,12 +1,13 @@
 {
-    "name": "Tacticore.UI",
+    "name": "Tacticore.Tools",
     "rootNamespace": "",
     "references": [
         "Tacticore.Core",
         "Tacticore.Paths",
         "Tacticore.Operators",
-        "Tacticore.Tools",
-        "Tacticore.Input"
+        "Tacticore.Input",
+        "Tacticore.Grid",
+        "Unity.2D.Tilemap.Extras"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

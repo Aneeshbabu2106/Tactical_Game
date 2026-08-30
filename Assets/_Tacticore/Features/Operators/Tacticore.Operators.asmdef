@@ -3,9 +3,7 @@
     "rootNamespace": "",
     "references": [
         "Tacticore.Core",
-        "Tacticore.Grid",
-        "Tacticore.Input",
-        "Unity.2D.Tilemap.Extras"
+        "Tacticore.Paths"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

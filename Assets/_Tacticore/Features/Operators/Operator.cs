@@ -22,7 +22,10 @@ public class Operator : MonoBehaviour
     private readonly List<Vector3> pathBuffer = new();
     private readonly List<Vector3> smoothBuffer = new();
     private readonly List<SpriteRenderer> dots = new();
+    private readonly List<SpriteRenderer> waypointRings = new();
+    private readonly List<SpriteRenderer> waypointFacings = new();
     private Transform dotRoot;
+    private Transform waypointRoot;
 
     public OperatorMotor Motor => motor;
 
@@ -31,6 +34,16 @@ public class Operator : MonoBehaviour
     public Vector2 Forward => motor?.Forward ?? Vector2.right;
 
     public float PickRadius => spec != null ? spec.pickRadius : 0.45f;
+
+    public float WaypointPickRadius => spec != null ? spec.waypointPickRadius : 0.32f;
+
+    public float PathStartClearance => spec != null ? spec.pathStartClearance : 0.55f;
+
+    public float PathHoverThreshold => spec != null ? spec.pathHoverThreshold : 0.35f;
+
+    public float WaypointMarkerSize => spec != null ? spec.waypointMarkerSize : 0.3f;
+
+    public Color PathColor => spec != null ? spec.pathColor : Color.cyan;
 
     public bool IsMoving => motor != null && motor.IsMoving;
 
@@ -41,9 +54,9 @@ public class Operator : MonoBehaviour
     {
         IsRunning = running;
 
-        if (motor != null && spec != null)
+        if (motor != null)
         {
-            motor.MoveSpeed = running ? spec.runSpeed : spec.walkSpeed;
+            motor.Running = running;
         }
     }
 
@@ -64,7 +77,8 @@ public class Operator : MonoBehaviour
 
         motor = new OperatorMotor(transform.position)
         {
-            MoveSpeed = spec.walkSpeed,
+            WalkSpeed = spec.walkSpeed,
+            RunSpeed = spec.runSpeed,
             TurnRate = spec.turnRate
         };
 
@@ -94,10 +108,19 @@ public class Operator : MonoBehaviour
 
     public Vector3? LookTarget => motor?.LookTarget;
 
+    /// <summary>The route and its waypoints, edited in place by the waypoint tools.</summary>
+    public PathPlan Plan => motor?.Plan;
+
     public void SetPath(List<Vector3> points)
     {
         motor.MoveTo(transform.position);
-        motor.SetPath(points);
+        motor.SetPath(points, spec.waypointTurnThreshold, spec.waypointMinSpacing, spec.waypointMaxSpacing);
+        RedrawPath();
+    }
+
+    /// <summary>Call after editing the plan from outside, so the drawn path catches up this frame.</summary>
+    public void PathChanged()
+    {
         RedrawPath();
     }
 
@@ -129,6 +152,8 @@ public class Operator : MonoBehaviour
         {
             pathLine.positionCount = 0;
             RedrawDots(null);
+            Hide(waypointRings, 0);
+            Hide(waypointFacings, 0);
             return;
         }
 
@@ -147,6 +172,77 @@ public class Operator : MonoBehaviour
         }
 
         RedrawDots(smoothBuffer);
+        RedrawWaypoints();
+    }
+
+    /// <summary>
+    ///     Rings for waypoints still ahead, with an arrowhead on any that carries a facing. Passed
+    ///     waypoints are hidden along with the path behind the operator.
+    /// </summary>
+    private void RedrawWaypoints()
+    {
+        var rings = 0;
+        var facings = 0;
+        var plan = motor.Plan;
+
+        foreach (var waypoint in plan.Waypoints)
+        {
+            if (waypoint.PointIndex < motor.NextIndex || waypoint.PointIndex >= plan.Points.Count)
+            {
+                continue;
+            }
+
+            var at = plan.Points[waypoint.PointIndex];
+
+            var ring = Pooled(waypointRings, rings++, waypointRoot, LineArt.Ring(), 104);
+            ring.color = waypoint.Run ? spec.waypointRunColor : spec.pathColor;
+            ring.transform.position = at;
+            ring.transform.localScale = Vector3.one * spec.waypointMarkerSize;
+
+            if (waypoint.FacingDegrees == null)
+            {
+                continue;
+            }
+
+            var angle = waypoint.FacingDegrees.Value;
+            var tick = Pooled(waypointFacings, facings++, waypointRoot, LineArt.Arrow(), 105);
+            tick.color = spec.lookMarkerColor;
+            tick.transform.position =
+                at + new Vector3(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad), 0f)
+                * spec.waypointMarkerSize;
+            tick.transform.localScale = Vector3.one * spec.waypointMarkerSize * 0.8f;
+            tick.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        }
+
+        Hide(waypointRings, rings);
+        Hide(waypointFacings, facings);
+    }
+
+    private static SpriteRenderer Pooled(
+        List<SpriteRenderer> pool, int index, Transform parent, Sprite sprite, int sortingOrder)
+    {
+        while (pool.Count <= index)
+        {
+            var host = new GameObject("Marker");
+            host.transform.SetParent(parent, false);
+
+            var created = host.AddComponent<SpriteRenderer>();
+            created.sprite = sprite;
+            created.sortingOrder = sortingOrder;
+            pool.Add(created);
+        }
+
+        var renderer = pool[index];
+        renderer.enabled = true;
+        return renderer;
+    }
+
+    private static void Hide(List<SpriteRenderer> pool, int from)
+    {
+        for (var i = from; i < pool.Count; i++)
+        {
+            pool[i].enabled = false;
+        }
     }
 
     /// <summary>
@@ -330,6 +426,9 @@ public class Operator : MonoBehaviour
 
         dotRoot = new GameObject("PathArrows").transform;
         dotRoot.SetParent(transform, false);
+
+        waypointRoot = new GameObject("Waypoints").transform;
+        waypointRoot.SetParent(transform, false);
     }
 
     /// <summary>

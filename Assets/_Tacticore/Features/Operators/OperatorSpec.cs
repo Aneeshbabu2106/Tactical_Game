@@ -27,6 +27,29 @@ public class OperatorSpec : ScriptableObject
     [Tooltip("How close the cursor must be, in cells, to start drawing from this operator.")]
     public float pickRadius = 0.45f;
 
+    [Header("Waypoints")]
+    [Tooltip("Degrees of accumulated turn along the stroke that earns a waypoint.")]
+    public float waypointTurnThreshold = 40f;
+
+    [Tooltip("Closest two auto-placed waypoints may sit, so a shaky hand cannot cluster them.")]
+    public float waypointMinSpacing = 1.2f;
+
+    [Tooltip("A straight run longer than this gets a waypoint anyway. Zero disables.")]
+    public float waypointMaxSpacing = 8f;
+
+    public float waypointPickRadius = 0.32f;
+
+    [Tooltip("A drawn path starts this far out from the operator, clear of its sprite and pick radius.")]
+    public float pathStartClearance = 0.55f;
+
+    [Tooltip("Cursor distance from the path that shows the add-waypoint marker.")]
+    public float pathHoverThreshold = 0.35f;
+
+    public float waypointMarkerSize = 0.3f;
+
+    [Tooltip("Ring colour for a waypoint set to run.")]
+    public Color waypointRunColor = new(1f, 0.55f, 0.27f, 1f);
+
     [Header("Look indicator")]
     public float lookLength = 0.95f;
     public Color lookColor = new(0.06f, 0.06f, 0.08f, 0.9f);

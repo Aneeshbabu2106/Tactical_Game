@@ -10,6 +10,7 @@ using UnityEngine.Tilemaps;
 public class OperatorPathInput : MonoBehaviour
 {
     [SerializeField] private PointerInput pointer;
+    [SerializeField] private PointerRouter router;
     [SerializeField] private Tilemap navigation;
 
     [Tooltip("Distance the cursor must travel before another point is added to the stroke.")]
@@ -48,6 +49,11 @@ public class OperatorPathInput : MonoBehaviour
             pointer = FindFirstObjectByType<PointerInput>();
         }
 
+        if (router == null)
+        {
+            router = FindFirstObjectByType<PointerRouter>();
+        }
+
         EnsureStrokeLine();
     }
 
@@ -60,7 +66,9 @@ public class OperatorPathInput : MonoBehaviour
 
         var cursor = pointer.WorldPosition;
 
-        if (pointer.Pressed)
+        // The router decides what a press is for; a waypoint or a path sitting under the cursor
+        // takes precedence over starting a new stroke.
+        if (pointer.Pressed && router != null && router.Kind == PointerTargetKind.Operator)
         {
             BeginStroke(cursor);
         }
@@ -92,8 +100,9 @@ public class OperatorPathInput : MonoBehaviour
         pressedAt = cursor;
         dragged = false;
 
+        // Starts empty. The first point is recorded once the cursor clears the operator, so no
+        // path point — and therefore no waypoint — can ever sit underneath it.
         stroke.Clear();
-        stroke.Add(drawing.transform.position);
         RedrawStroke();
     }
 
@@ -116,13 +125,24 @@ public class OperatorPathInput : MonoBehaviour
             drawing.ClearPath();
         }
 
-        var last = stroke[stroke.Count - 1];
+        var origin = drawing.transform.position;
 
-        if (Vector3.Distance(cursor, last) < sampleSpacing)
+        // Nothing is recorded inside the operator: those points hide under its sprite, and a
+        // waypoint landing there would take the clicks meant for the operator itself.
+        if (Vector3.Distance(cursor, origin) < drawing.PathStartClearance)
         {
             return;
         }
 
+        var started = stroke.Count > 0;
+        var last = started ? stroke[stroke.Count - 1] : origin;
+
+        if (started && Vector3.Distance(cursor, last) < sampleSpacing)
+        {
+            return;
+        }
+
+        // The first segment is validated from the operator, so leaving it cannot cross a wall.
         if (!SegmentIsWalkable(last, cursor))
         {
             return;
@@ -134,10 +154,9 @@ public class OperatorPathInput : MonoBehaviour
 
     private void CommitStroke()
     {
-        if (dragged && stroke.Count > 1)
+        if (dragged && stroke.Count > 0)
         {
-            // The first point is the operator's own position, not somewhere to walk to.
-            drawing.SetPath(stroke.GetRange(1, stroke.Count - 1));
+            drawing.SetPath(stroke);
         }
         else
         {

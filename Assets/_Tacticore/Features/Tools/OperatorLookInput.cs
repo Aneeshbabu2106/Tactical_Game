@@ -8,6 +8,7 @@ using UnityEngine;
 public class OperatorLookInput : MonoBehaviour
 {
     [SerializeField] private PointerInput pointer;
+    [SerializeField] private PointerRouter router;
 
     [Tooltip("Drag shorter than this counts as a click, which clears the look target.")]
     [SerializeField] private float clickThreshold = 0.25f;
@@ -22,6 +23,11 @@ public class OperatorLookInput : MonoBehaviour
         {
             pointer = FindFirstObjectByType<PointerInput>();
         }
+
+        if (router == null)
+        {
+            router = FindFirstObjectByType<PointerRouter>();
+        }
     }
 
     private void Update()
@@ -33,7 +39,7 @@ public class OperatorLookInput : MonoBehaviour
 
         var cursor = pointer.WorldPosition;
 
-        if (pointer.RightPressed)
+        if (pointer.RightPressed && router != null && router.Kind == PointerTargetKind.Operator)
         {
             BeginAim(cursor);
         }
