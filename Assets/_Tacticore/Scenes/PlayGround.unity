@@ -133,6 +133,8 @@ GameObject:
   - component: {fileID: 242055843}
   - component: {fileID: 242055844}
   - component: {fileID: 242055845}
+  - component: {fileID: 242055846}
+  - component: {fileID: 242055847}
   m_Layer: 0
   m_Name: OperatorInput
   m_TagString: Untagged
@@ -168,6 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Operators::OperatorPathInput
   pointer: {fileID: 242055842}
+  router: {fileID: 242055846}
   navigation: {fileID: 2093554710}
   sampleSpacing: 0.2
   clearanceStep: 0.2
@@ -202,6 +205,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Operators::OperatorLookInput
   pointer: {fileID: 242055842}
+  router: {fileID: 242055846}
   clickThreshold: 0.25
 --- !u!114 &242055844
 MonoBehaviour:
@@ -229,10 +233,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: Tacticore.UI::OperatorActionMenu
   pointer: {fileID: 242055842}
   pathInput: {fileID: 242055841}
+  waypointInput: {fileID: 242055847}
   view: {fileID: 519420031}
   panelSize: {x: 148, y: 66}
   gapAboveOperator: 22
   padding: 6
+--- !u!114 &242055846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242055839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4f0435e86733f844b3b71c65c97fe44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Operators::PointerRouter
+  pointer: {fileID: 242055842}
+  rescanInterval: 0.5
+--- !u!114 &242055847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242055839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14cf550c3cadf4b479e2d9a5a2825db6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Operators::WaypointInput
+  pointer: {fileID: 242055842}
+  router: {fileID: 242055846}
+  navigation: {fileID: 2093554710}
+  clickThreshold: 0.2
+  clearanceStep: 0.2
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
