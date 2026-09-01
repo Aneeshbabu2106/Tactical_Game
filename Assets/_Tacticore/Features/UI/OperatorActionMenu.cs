@@ -18,6 +18,7 @@ public class OperatorActionMenu : MonoBehaviour
     [SerializeField] private PointerInput pointer;
     [SerializeField] private OperatorPathInput pathInput;
     [SerializeField] private WaypointInput waypointInput;
+    [SerializeField] private OpeningInput openingInput;
     [SerializeField] private Camera view;
 
     [Header("Layout, in pixels")]
@@ -30,6 +31,7 @@ public class OperatorActionMenu : MonoBehaviour
 
     private Operator target;
     private Waypoint waypoint;
+    private Opening opening;
     private Rect panel;
 
     private readonly struct Row
@@ -65,6 +67,10 @@ public class OperatorActionMenu : MonoBehaviour
             waypointInput = FindFirstObjectByType<WaypointInput>();
         }
 
+        if (openingInput == null)
+        {
+            openingInput = FindFirstObjectByType<OpeningInput>();
+        }
 
 
         if (view == null)
@@ -85,7 +91,10 @@ public class OperatorActionMenu : MonoBehaviour
             waypointInput.WaypointClicked += OpenForWaypoint;
         }
 
-
+        if (openingInput != null)
+        {
+            openingInput.OpeningClicked += OpenForOpening;
+        }
     }
 
     private void OnDisable()
@@ -100,14 +109,31 @@ public class OperatorActionMenu : MonoBehaviour
             waypointInput.WaypointClicked -= OpenForWaypoint;
         }
 
-
+        if (openingInput != null)
+        {
+            openingInput.OpeningClicked -= OpenForOpening;
+        }
     }
 
     private void Update()
     {
+        // Tells the opening tool to sit out while this panel is up: it covers the very cell that
+        // opened it, so a click on a row would otherwise be read as another click on the door.
+        if (openingInput != null)
+        {
+            openingInput.Suppressed = IsOpen;
+        }
+
         // The operator can be destroyed while its menu is up.
         if (target == null)
         {
+            return;
+        }
+
+        // The door swung, or the glass went, while the panel was still showing.
+        if (opening != null && !OpeningActions.HasAny(opening))
+        {
+            Close();
             return;
         }
 
@@ -168,18 +194,28 @@ public class OperatorActionMenu : MonoBehaviour
     {
         target = op;
         waypoint = null;
+        opening = null;
     }
 
     public void OpenForWaypoint(Operator op, Waypoint wp)
     {
         target = op;
         waypoint = wp;
+        opening = null;
+    }
+
+    public void OpenForOpening(Operator op, Opening hit)
+    {
+        target = op;
+        waypoint = null;
+        opening = hit;
     }
 
     public void Close()
     {
         target = null;
         waypoint = null;
+        opening = null;
     }
 
     /// <summary>
@@ -189,6 +225,23 @@ public class OperatorActionMenu : MonoBehaviour
     private void BuildRows()
     {
         rows.Clear();
+
+        if (opening != null)
+        {
+            foreach (var verb in OpeningActions.For(opening))
+            {
+                // Captured by value: the struct is a data row, and the loop variable moves on.
+                var queued = verb;
+
+                rows.Add(new Row(queued.Label, openingInput != null, () =>
+                {
+                    openingInput.Queue(target, opening, queued);
+                    Close();
+                }));
+            }
+
+            return;
+        }
 
         if (waypoint != null)
         {
@@ -211,9 +264,10 @@ public class OperatorActionMenu : MonoBehaviour
     {
         BuildRows();
 
-        var anchor = waypoint != null && waypoint.PointIndex < target.Plan.Points.Count
-            ? target.Plan.Points[waypoint.PointIndex]
-            : target.transform.position;
+        var anchor = opening != null ? opening.transform.position
+            : waypoint != null && waypoint.PointIndex < target.Plan.Points.Count
+                ? target.Plan.Points[waypoint.PointIndex]
+                : target.transform.position;
 
         var screen = view.WorldToScreenPoint(anchor);
 

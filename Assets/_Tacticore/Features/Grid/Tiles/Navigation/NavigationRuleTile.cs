@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public enum NavigationType
@@ -34,6 +35,34 @@ public abstract class NavigationRuleTile : ExtendedRuleTile
     }
 
     public abstract NavigationType Type { get; }
+
+    /// <summary>
+    ///     Hands a spawned <see cref="Opening" /> its cell. Doors and windows both arrive this way,
+    ///     so neither tile type needs an override of its own.
+    /// </summary>
+    public override bool StartUp(Vector3Int position, ITilemap tilemap, GameObject instantiatedGameObject)
+    {
+        // Base does the transform placement for the spawned prefab, so let it run first.
+        var result = base.StartUp(position, tilemap, instantiatedGameObject);
+
+        if (instantiatedGameObject != null && instantiatedGameObject.TryGetComponent(out Opening opening))
+        {
+            opening.Place(position, IsVerticalAt(position, tilemap));
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    ///     A cell with wall-like neighbours above and below sits in a vertical wall run, and is
+    ///     therefore crossed east to west. Derived from the tilemap rather than from which rule
+    ///     matched, which RuleTile does not expose.
+    /// </summary>
+    protected static bool IsVerticalAt(Vector3Int position, ITilemap tilemap)
+    {
+        return IsWallLike(tilemap.GetTile(position + Vector3Int.up))
+               && IsWallLike(tilemap.GetTile(position + Vector3Int.down));
+    }
 
     public override Type NeighborVocabulary => typeof(NavigationNeighbor);
 

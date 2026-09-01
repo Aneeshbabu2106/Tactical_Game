@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 /// <summary>What the pointer is currently over. Resolved in one place, in priority order.</summary>
 public enum PointerTargetKind
@@ -6,6 +7,7 @@ public enum PointerTargetKind
     None,
     Waypoint,
     Operator,
+    Opening,
     Path
 }
 
@@ -24,6 +26,7 @@ public enum PointerTargetKind
 public class PointerRouter : MonoBehaviour
 {
     [SerializeField] private PointerInput pointer;
+    [SerializeField] private Tilemap navigation;
 
     [Tooltip("Seconds between rescans for operators, rather than searching the scene every frame.")]
     [SerializeField] private float rescanInterval = 0.5f;
@@ -37,6 +40,9 @@ public class PointerRouter : MonoBehaviour
     public Operator Operator { get; private set; }
 
     public Waypoint Waypoint { get; private set; }
+
+    /// <summary>The door or window under the cursor, when the pointer is over one.</summary>
+    public Opening Opening { get; private set; }
 
     /// <summary>Closest position on the hovered path, and the point index nearest to it.</summary>
     public Vector3 PathPoint { get; private set; }
@@ -58,6 +64,7 @@ public class PointerRouter : MonoBehaviour
         Kind = PointerTargetKind.None;
         Operator = null;
         Waypoint = null;
+        Opening = null;
 
         if (pointer == null || !pointer.IsAvailable)
         {
@@ -80,8 +87,8 @@ public class PointerRouter : MonoBehaviour
     }
 
     /// <summary>
-    ///     Waypoint, then operator, then path. A waypoint sits on the path and often near the
-    ///     operator, so the smallest target has to win or it becomes unclickable.
+    ///     Waypoint, then operator, then opening, then path. A waypoint sits on the path and often
+    ///     near the operator, so the smallest target has to win or it becomes unclickable.
     /// </summary>
     private void Resolve(Vector3 cursor)
     {
@@ -96,12 +103,25 @@ public class PointerRouter : MonoBehaviour
 
             foreach (var waypoint in op.Plan.Waypoints)
             {
-                if (waypoint.PointIndex >= op.Plan.Points.Count)
+                // Only what is actually drawn can be clicked. A waypoint already walked past is
+                // hidden by Operator.RedrawWaypoints, and an invisible target that swallows clicks
+                // is worse than no target at all.
+                if (waypoint.PointIndex >= op.Plan.Points.Count || waypoint.PointIndex < op.NextIndex)
                 {
                     continue;
                 }
 
-                var d = Vector2.Distance(op.Plan.Points[waypoint.PointIndex], cursor);
+                var at = op.Plan.Points[waypoint.PointIndex];
+
+                // A waypoint underfoot loses to the man standing on it. Queued door actions put one
+                // exactly where the operator stops, and while paused it sits there indefinitely —
+                // which made him impossible to grab and drag a new path from.
+                if (Vector2.Distance(at, op.transform.position) <= op.PickRadius)
+                {
+                    continue;
+                }
+
+                var d = Vector2.Distance(at, cursor);
 
                 if (d <= op.WaypointPickRadius && d < best)
                 {
@@ -124,6 +144,20 @@ public class PointerRouter : MonoBehaviour
         {
             Kind = PointerTargetKind.Operator;
             Operator = hit;
+            return;
+        }
+
+        // A door is a whole cell and a dictionary lookup away, so it costs nothing to test. It
+        // outranks the path: a route crossing a doorway must not make the door unclickable. The
+        // cost is that the add-waypoint hint does not appear over one, which suits a doorway.
+        // A spent opening — door already swung, glass already gone — has no verbs left, so it drops
+        // out of the reckoning entirely and the path underneath becomes clickable again.
+        if (navigation != null
+            && OpeningRegistry.TryGet(navigation.WorldToCell(cursor), out var opening)
+            && OpeningActions.HasAny(opening))
+        {
+            Kind = PointerTargetKind.Opening;
+            Opening = opening;
             return;
         }
 

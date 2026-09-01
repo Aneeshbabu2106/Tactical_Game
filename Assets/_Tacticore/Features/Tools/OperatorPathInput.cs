@@ -143,7 +143,7 @@ public class OperatorPathInput : MonoBehaviour
         }
 
         // The first segment is validated from the operator, so leaving it cannot cross a wall.
-        if (!SegmentIsWalkable(last, cursor))
+        if (!NavigationQuery.SegmentIsWalkable(navigation, last, cursor, clearanceStep))
         {
             return;
         }
@@ -166,24 +166,6 @@ public class OperatorPathInput : MonoBehaviour
         drawing = null;
         stroke.Clear();
         RedrawStroke();
-    }
-
-    private bool SegmentIsWalkable(Vector3 from, Vector3 to)
-    {
-        var length = Vector3.Distance(from, to);
-        var steps = Mathf.Max(1, Mathf.CeilToInt(length / clearanceStep));
-
-        for (var i = 0; i <= steps; i++)
-        {
-            var point = Vector3.Lerp(from, to, i / (float)steps);
-
-            if (!NavigationQuery.IsWalkable(navigation, navigation.WorldToCell(point)))
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void RedrawStroke()

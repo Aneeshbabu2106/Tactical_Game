@@ -3,6 +3,7 @@
     "rootNamespace": "",
     "references": [
         "Tacticore.Core",
+        "Tacticore.Grid",
         "Tacticore.Paths",
         "Tacticore.Operators",
         "Tacticore.Tools",

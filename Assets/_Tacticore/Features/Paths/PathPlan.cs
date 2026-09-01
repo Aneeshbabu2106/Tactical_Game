@@ -124,6 +124,37 @@ public class PathPlan
     }
 
     /// <summary>
+    ///     Extends the route, leaving the existing waypoints alone. Unlike <see cref="SetPoints" />
+    ///     this never re-derives them: appending happens to make room for a waypoint the caller is
+    ///     about to add, and re-running <see cref="AutoPlace" /> would throw that away.
+    /// </summary>
+    /// <returns>The index of the last appended point, or -1 if nothing was added.</returns>
+    public int Append(IReadOnlyList<Vector3> points)
+    {
+        if (points == null || points.Count == 0)
+        {
+            return -1;
+        }
+
+        Points.AddRange(points);
+        return Points.Count - 1;
+    }
+
+    /// <summary>The waypoint anchored exactly at a point index, or null if none is.</summary>
+    public Waypoint At(int pointIndex)
+    {
+        for (var i = 0; i < Waypoints.Count; i++)
+        {
+            if (Waypoints[i].PointIndex == pointIndex)
+            {
+                return Waypoints[i];
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     ///     The stretch of path a waypoint owns: from the previous waypoint to the next one, or to
     ///     the ends of the path where there is no neighbour. Nothing outside this span may move when
     ///     the waypoint does.

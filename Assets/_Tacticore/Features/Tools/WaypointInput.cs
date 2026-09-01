@@ -170,29 +170,17 @@ public class WaypointInput : MonoBehaviour
 
         plan.GetSpan(waypoint, out var from, out var to);
 
-        for (var i = from; i <= to && i < plan.Points.Count; i++)
+        // A one-point span has no segment to sample; check the point itself.
+        if (from >= to)
         {
-            if (!NavigationQuery.IsWalkable(navigation, navigation.WorldToCell(plan.Points[i])))
+            return NavigationQuery.IsWalkable(navigation, navigation.WorldToCell(plan.Points[from]));
+        }
+
+        for (var i = from; i < to && i + 1 < plan.Points.Count; i++)
+        {
+            if (!NavigationQuery.SegmentIsWalkable(navigation, plan.Points[i], plan.Points[i + 1], clearanceStep))
             {
                 return false;
-            }
-
-            if (i >= to)
-            {
-                break;
-            }
-
-            var length = Vector3.Distance(plan.Points[i], plan.Points[i + 1]);
-            var steps = Mathf.Max(1, Mathf.CeilToInt(length / clearanceStep));
-
-            for (var s = 1; s < steps; s++)
-            {
-                var between = Vector3.Lerp(plan.Points[i], plan.Points[i + 1], s / (float)steps);
-
-                if (!NavigationQuery.IsWalkable(navigation, navigation.WorldToCell(between)))
-                {
-                    return false;
-                }
             }
         }
 

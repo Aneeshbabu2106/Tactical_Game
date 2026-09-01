@@ -45,10 +45,28 @@ public class OperatorSpec : ScriptableObject
     [Tooltip("Cursor distance from the path that shows the add-waypoint marker.")]
     public float pathHoverThreshold = 0.35f;
 
+    [Header("Openings")]
+    [Tooltip("How close the operator must get to a door or window to work on it, in cells. Short of "
+             + "the doorstep, so he is clear of the arc the leaf swings through.")]
+    public float openingReach = 0.9f;
+
     public float waypointMarkerSize = 0.3f;
 
     [Tooltip("Ring colour for a waypoint set to run.")]
     public Color waypointRunColor = new(1f, 0.55f, 0.27f, 1f);
+
+    [Tooltip("Ring colour for a waypoint carrying an unfinished action, such as opening a door.")]
+    public Color waypointActionColor = new(1f, 0.85f, 0.35f, 1f);
+
+    [Header("Action progress")]
+    [Tooltip("Width of the bar shown under an operator while it works on an action.")]
+    public float actionBarWidth = 0.7f;
+
+    [Tooltip("Offset from the operator to the bar, so it does not sit under the sprite.")]
+    public Vector2 actionBarOffset = new(0f, -0.45f);
+
+    public Color actionBarColor = new(1f, 0.85f, 0.35f, 1f);
+    public Color actionBarTrackColor = new(0.1f, 0.11f, 0.13f, 0.75f);
 
     [Header("Look indicator")]
     public float lookLength = 0.95f;

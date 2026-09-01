@@ -26,6 +26,8 @@ public class Operator : MonoBehaviour
     private readonly List<SpriteRenderer> waypointFacings = new();
     private Transform dotRoot;
     private Transform waypointRoot;
+    private LineRenderer actionBar;
+    private LineRenderer actionBarTrack;
 
     public OperatorMotor Motor => motor;
 
@@ -41,11 +43,19 @@ public class Operator : MonoBehaviour
 
     public float PathHoverThreshold => spec != null ? spec.pathHoverThreshold : 0.35f;
 
+    public float OpeningReach => spec != null ? spec.openingReach : 0.9f;
+
     public float WaypointMarkerSize => spec != null ? spec.waypointMarkerSize : 0.3f;
 
     public Color PathColor => spec != null ? spec.pathColor : Color.cyan;
 
     public bool IsMoving => motor != null && motor.IsMoving;
+
+    /// <summary>Index of the point being walked towards; everything before it is already behind.</summary>
+    public int NextIndex => motor?.NextIndex ?? 0;
+
+    /// <summary>True while stopped working on a waypoint action, such as opening a door.</summary>
+    public bool IsBusy => motor != null && motor.IsBusy;
 
     /// <summary>Pace toggle. Applies immediately, mid-path included.</summary>
     public bool IsRunning { get; private set; }
@@ -84,6 +94,7 @@ public class Operator : MonoBehaviour
 
         EnsurePathLine();
         EnsureLookMarker();
+        EnsureActionBar();
         EnsureRig();
         ApplyMotorState();
     }
@@ -95,6 +106,7 @@ public class Operator : MonoBehaviour
         ApplyMotorState();
         RedrawPath();
         RedrawLookMarker();
+        RedrawActionBar();
     }
 
     /// <summary>
@@ -195,7 +207,11 @@ public class Operator : MonoBehaviour
             var at = plan.Points[waypoint.PointIndex];
 
             var ring = Pooled(waypointRings, rings++, waypointRoot, LineArt.Ring(), 104);
-            ring.color = waypoint.Run ? spec.waypointRunColor : spec.pathColor;
+
+            // Outstanding work outranks pace: it is the reason this waypoint exists.
+            ring.color = waypoint.HasPendingAction ? spec.waypointActionColor
+                : waypoint.Run ? spec.waypointRunColor
+                : spec.pathColor;
             ring.transform.position = at;
             ring.transform.localScale = Vector3.one * spec.waypointMarkerSize;
 
@@ -342,6 +358,61 @@ public class Operator : MonoBehaviour
         lookMarker.SetPosition(4, target + new Vector3(-arm, arm, 0f));
         lookMarker.SetPosition(5, target + new Vector3(arm, -arm, 0f));
         lookMarker.SetPosition(6, target);
+    }
+
+    /// <summary>
+    ///     A bar under the operator while it works, so a man standing still at a door reads as busy
+    ///     rather than stuck. Hidden the rest of the time.
+    /// </summary>
+    private void RedrawActionBar()
+    {
+        var busy = motor.IsBusy;
+
+        actionBar.enabled = busy;
+        actionBarTrack.enabled = busy;
+
+        if (!busy)
+        {
+            return;
+        }
+
+        var half = spec.actionBarWidth * 0.5f;
+        var origin = transform.position + new Vector3(spec.actionBarOffset.x, spec.actionBarOffset.y, 0f);
+        var left = origin + Vector3.left * half;
+
+        actionBarTrack.SetPosition(0, left);
+        actionBarTrack.SetPosition(1, origin + Vector3.right * half);
+
+        actionBar.SetPosition(0, left);
+        actionBar.SetPosition(1, left + Vector3.right * spec.actionBarWidth * motor.ActionProgress);
+    }
+
+    private void EnsureActionBar()
+    {
+        if (actionBar != null)
+        {
+            return;
+        }
+
+        actionBarTrack = BuildBar("ActionBarTrack", spec.actionBarTrackColor, 0.09f, 107);
+        actionBar = BuildBar("ActionBar", spec.actionBarColor, 0.07f, 108);
+    }
+
+    private LineRenderer BuildBar(string barName, Color color, float width, int sortingOrder)
+    {
+        var host = new GameObject(barName);
+        host.transform.SetParent(transform, false);
+
+        var renderer = host.AddComponent<LineRenderer>();
+        renderer.useWorldSpace = true;
+        renderer.widthMultiplier = width;
+        renderer.positionCount = 2;
+        renderer.material = new Material(Shader.Find("Sprites/Default"));
+        renderer.startColor = color;
+        renderer.endColor = color;
+        renderer.sortingOrder = sortingOrder;
+        renderer.enabled = false;
+        return renderer;
     }
 
     private void EnsureLookMarker()

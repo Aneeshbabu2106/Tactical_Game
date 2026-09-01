@@ -16,4 +16,15 @@ public class Waypoint
 
     /// <summary>Look direction to hold on this leg, or null to leave the facing to the walk.</summary>
     public float? FacingDegrees;
+
+    /// <summary>Work to do on arrival, or null to walk straight through.</summary>
+    public IWaypointAction Action;
+
+    /// <summary>
+    ///     Set once the action has run. Kept on the waypoint rather than cleared with the action
+    ///     itself, so the marker stays on the path showing where the work was done.
+    /// </summary>
+    public bool ActionDone;
+
+    public bool HasPendingAction => Action != null && !ActionDone;
 }

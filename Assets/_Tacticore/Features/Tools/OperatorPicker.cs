@@ -24,4 +24,27 @@ public static class OperatorPicker
 
         return best;
     }
+
+    /// <summary>
+    ///     The closest operator regardless of pick radius, for orders aimed at the world rather than
+    ///     at a man — a door gets worked by whoever is nearest it.
+    /// </summary>
+    public static Operator Nearest(Vector3 worldPosition)
+    {
+        Operator best = null;
+        var bestDistance = float.MaxValue;
+
+        foreach (var candidate in Object.FindObjectsByType<Operator>(FindObjectsSortMode.None))
+        {
+            var distance = Vector2.Distance(candidate.transform.position, worldPosition);
+
+            if (distance < bestDistance)
+            {
+                best = candidate;
+                bestDistance = distance;
+            }
+        }
+
+        return best;
+    }
 }
