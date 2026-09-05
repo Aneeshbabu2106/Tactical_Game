@@ -54,31 +54,12 @@ public class OperatorSpec : ScriptableObject
     private PlanningRules planningFallback;
     private OperatorStyle styleFallback;
 
-    public WeaponSpec Weapon => Or(weapon, ref weaponFallback);
+    public WeaponSpec Weapon => SpecFallback.Or(weapon, ref weaponFallback);
 
-    public VisionSpec Vision => Or(vision, ref visionFallback);
+    public VisionSpec Vision => SpecFallback.Or(vision, ref visionFallback);
 
-    public PlanningRules Planning => Or(planning, ref planningFallback);
+    public PlanningRules Planning => SpecFallback.Or(planning, ref planningFallback);
 
-    public OperatorStyle Style => Or(style, ref styleFallback);
+    public OperatorStyle Style => SpecFallback.Or(style, ref styleFallback);
 
-    /// <summary>
-    ///     The assigned asset, or a throwaway instance carrying the C# defaults. Never null, so
-    ///     callers read <c>spec.Weapon.damage</c> without a null check at every use.
-    /// </summary>
-    private static T Or<T>(T assigned, ref T fallback) where T : ScriptableObject
-    {
-        if (assigned != null)
-        {
-            return assigned;
-        }
-
-        if (fallback == null)
-        {
-            fallback = CreateInstance<T>();
-            fallback.hideFlags = HideFlags.HideAndDontSave;
-        }
-
-        return fallback;
-    }
 }
