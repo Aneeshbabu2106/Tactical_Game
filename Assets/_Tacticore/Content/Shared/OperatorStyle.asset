@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1171e842b3969a4b80b0289e613f7b1, type: 3}
+  m_Name: OperatorStyle
+  m_EditorClassIdentifier: Tacticore.Data::OperatorStyle
+  waypointMarkerSize: 0.3
+  waypointRunColor: {r: 1, g: 0.55, b: 0.27, a: 1}
+  waypointActionColor: {r: 1, g: 0.85, b: 0.35, a: 1}
+  pathMarkerSpacing: 2.2
+  pathMarkerSize: 0.28
+  actionBarWidth: 0.7
+  actionBarOffset: {x: 0, y: -0.45}
+  actionBarColor: {r: 1, g: 0.85, b: 0.35, a: 1}
+  actionBarTrackColor: {r: 0.1, g: 0.11, b: 0.13, a: 0.75}
+  lookLength: 0.95
+  lookColor: {r: 0.06, g: 0.06, b: 0.08, a: 0.9}
+  lookMarkerColor: {r: 1, g: 0.72, b: 0.27, a: 0.85}
+  lookMarkerSize: 0.16
+  gunSprite: {fileID: 0}
+  gunOffset: {x: 0.16, y: -0.14}
+  gunSize: {x: 0.52, y: 0.1}
+  gunColor: {r: 0.13, g: 0.14, b: 0.16, a: 1}

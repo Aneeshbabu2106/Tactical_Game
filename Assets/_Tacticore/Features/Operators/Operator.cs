@@ -35,17 +35,51 @@ public class Operator : MonoBehaviour
 
     public Vector2 Forward => motor?.Forward ?? Vector2.right;
 
-    public float PickRadius => spec != null ? spec.pickRadius : 0.45f;
+    public float PickRadius => spec != null ? spec.Planning.operatorPickRadius : 0.45f;
 
-    public float WaypointPickRadius => spec != null ? spec.waypointPickRadius : 0.32f;
+    public float WaypointPickRadius => spec != null ? spec.Planning.waypointPickRadius : 0.32f;
 
-    public float PathStartClearance => spec != null ? spec.pathStartClearance : 0.55f;
+    public float PathStartClearance => spec != null ? spec.Planning.pathStartClearance : 0.55f;
 
-    public float PathHoverThreshold => spec != null ? spec.pathHoverThreshold : 0.35f;
+    public float PathHoverThreshold => spec != null ? spec.Planning.pathHoverThreshold : 0.35f;
 
     public float OpeningReach => spec != null ? spec.openingReach : 0.9f;
 
-    public float WaypointMarkerSize => spec != null ? spec.waypointMarkerSize : 0.3f;
+    public float VisionFov => spec != null ? spec.Vision.fovDegrees : 120f;
+
+    public float WeaponDamage => spec != null ? spec.Weapon.damage : 34f;
+
+    public float RoundsPerMinute => spec != null ? spec.Weapon.roundsPerMinute : 750f;
+
+    public int MagazineSize => spec != null ? spec.Weapon.magazineSize : 30;
+
+    public float ReloadSeconds => spec != null ? spec.Weapon.reloadSeconds : 2f;
+
+    public float WeaponRange => spec != null ? spec.Weapon.range : 12f;
+
+    public float WeaponAccuracy => spec != null ? spec.Weapon.accuracy : 0.66f;
+
+    public float VisionRange => spec != null ? spec.Vision.range : 12f;
+
+    public float VisionNearRadius => spec != null ? spec.Vision.nearRadius : 1.6f;
+
+    public float VisionStepDegrees => spec != null ? spec.Vision.stepDegrees : 2f;
+
+    public Color ConeColor => spec != null ? spec.coneColor : new Color(1f, 0.863f, 0.651f, 0.30f);
+
+    /// <summary>
+    ///     Whether this operator is the one the player is currently working with. Only the selected
+    ///     operator draws a view cone — the prototype's rule, so a squad does not become a mess of
+    ///     overlapping wedges.
+    /// </summary>
+    public bool IsSelected { get; private set; }
+
+    public void SetSelected(bool selected)
+    {
+        IsSelected = selected;
+    }
+
+    public float WaypointMarkerSize => spec != null ? spec.Style.waypointMarkerSize : 0.3f;
 
     public Color PathColor => spec != null ? spec.pathColor : Color.cyan;
 
@@ -74,6 +108,44 @@ public class Operator : MonoBehaviour
     {
         SetRunning(!IsRunning);
     }
+
+    [Tooltip("How he handles contact when the mission starts. Changed in play from his menu.")]
+    [SerializeField] private EngagementMode engagement = EngagementMode.KeepMoving;
+
+    /// <summary>How he handles contact. The order given before he goes in.</summary>
+    public EngagementMode Engagement => engagement;
+
+    public void SetEngagement(EngagementMode mode)
+    {
+        engagement = mode;
+
+        // A mode that cannot hold him must not leave him held.
+        if (mode != EngagementMode.WaitToClear)
+        {
+            Hold(false);
+        }
+    }
+
+    public void CycleEngagement()
+    {
+        SetEngagement(Engagement switch
+        {
+            EngagementMode.KeepMoving => EngagementMode.WaitToClear,
+            EngagementMode.WaitToClear => EngagementMode.HoldFire,
+            _ => EngagementMode.KeepMoving
+        });
+    }
+
+    /// <summary>Stops him advancing without losing the route.</summary>
+    public void Hold(bool holding)
+    {
+        if (motor != null)
+        {
+            motor.Holding = holding;
+        }
+    }
+
+    public bool IsHolding => motor is { Holding: true };
 
     private void Awake()
     {
@@ -126,7 +198,7 @@ public class Operator : MonoBehaviour
     public void SetPath(List<Vector3> points)
     {
         motor.MoveTo(transform.position);
-        motor.SetPath(points, spec.waypointTurnThreshold, spec.waypointMinSpacing, spec.waypointMaxSpacing);
+        motor.SetPath(points, spec.Planning.waypointTurnThreshold, spec.Planning.waypointMinSpacing, spec.Planning.waypointMaxSpacing);
         RedrawPath();
     }
 
@@ -174,7 +246,7 @@ public class Operator : MonoBehaviour
         pathBuffer.Add(transform.position);
         pathBuffer.AddRange(motor.Remaining);
 
-        PathSmoothing.Smooth(pathBuffer, smoothBuffer, spec.pathSmoothing);
+        PathSmoothing.Smooth(pathBuffer, smoothBuffer, spec.Planning.pathSmoothing);
 
         pathLine.positionCount = smoothBuffer.Count;
 
@@ -209,11 +281,11 @@ public class Operator : MonoBehaviour
             var ring = Pooled(waypointRings, rings++, waypointRoot, LineArt.Ring(), 104);
 
             // Outstanding work outranks pace: it is the reason this waypoint exists.
-            ring.color = waypoint.HasPendingAction ? spec.waypointActionColor
-                : waypoint.Run ? spec.waypointRunColor
+            ring.color = waypoint.HasPendingAction ? spec.Style.waypointActionColor
+                : waypoint.Run ? spec.Style.waypointRunColor
                 : spec.pathColor;
             ring.transform.position = at;
-            ring.transform.localScale = Vector3.one * spec.waypointMarkerSize;
+            ring.transform.localScale = Vector3.one * spec.Style.waypointMarkerSize;
 
             if (waypoint.FacingDegrees == null)
             {
@@ -222,11 +294,11 @@ public class Operator : MonoBehaviour
 
             var angle = waypoint.FacingDegrees.Value;
             var tick = Pooled(waypointFacings, facings++, waypointRoot, LineArt.Arrow(), 105);
-            tick.color = spec.lookMarkerColor;
+            tick.color = spec.Style.lookMarkerColor;
             tick.transform.position =
                 at + new Vector3(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad), 0f)
-                * spec.waypointMarkerSize;
-            tick.transform.localScale = Vector3.one * spec.waypointMarkerSize * 0.8f;
+                * spec.Style.waypointMarkerSize;
+            tick.transform.localScale = Vector3.one * spec.Style.waypointMarkerSize * 0.8f;
             tick.transform.rotation = Quaternion.Euler(0f, 0f, angle);
         }
 
@@ -270,7 +342,7 @@ public class Operator : MonoBehaviour
     {
         var used = 0;
 
-        if (curve != null && curve.Count > 1 && spec.pathMarkerSpacing > 0f)
+        if (curve != null && curve.Count > 1 && spec.Style.pathMarkerSpacing > 0f)
         {
             var carried = 0f;
 
@@ -286,16 +358,16 @@ public class Operator : MonoBehaviour
                 }
 
                 // Carry the remainder across segments so spacing stays even, not per-segment.
-                var travelled = spec.pathMarkerSpacing - carried;
+                var travelled = spec.Style.pathMarkerSpacing - carried;
                 var heading = (to - from) / segment;
 
                 while (travelled <= segment)
                 {
                     PlaceMarker(used++, Vector3.Lerp(from, to, travelled / segment), heading);
-                    travelled += spec.pathMarkerSpacing;
+                    travelled += spec.Style.pathMarkerSpacing;
                 }
 
-                carried = segment - (travelled - spec.pathMarkerSpacing);
+                carried = segment - (travelled - spec.Style.pathMarkerSpacing);
             }
         }
 
@@ -322,7 +394,7 @@ public class Operator : MonoBehaviour
         marker.enabled = true;
         marker.color = spec.pathColor;
         marker.transform.position = position;
-        marker.transform.localScale = Vector3.one * spec.pathMarkerSize;
+        marker.transform.localScale = Vector3.one * spec.Style.pathMarkerSize;
 
         // The sprite points along +X, so align its right axis with the direction of travel.
         marker.transform.rotation =
@@ -347,7 +419,7 @@ public class Operator : MonoBehaviour
         }
 
         var target = motor.LookTarget.Value;
-        var arm = spec.lookMarkerSize;
+        var arm = spec.Style.lookMarkerSize;
 
         // One polyline: leader in, then a cross drawn by doubling back through the centre.
         lookMarker.positionCount = 7;
@@ -376,15 +448,15 @@ public class Operator : MonoBehaviour
             return;
         }
 
-        var half = spec.actionBarWidth * 0.5f;
-        var origin = transform.position + new Vector3(spec.actionBarOffset.x, spec.actionBarOffset.y, 0f);
+        var half = spec.Style.actionBarWidth * 0.5f;
+        var origin = transform.position + new Vector3(spec.Style.actionBarOffset.x, spec.Style.actionBarOffset.y, 0f);
         var left = origin + Vector3.left * half;
 
         actionBarTrack.SetPosition(0, left);
         actionBarTrack.SetPosition(1, origin + Vector3.right * half);
 
         actionBar.SetPosition(0, left);
-        actionBar.SetPosition(1, left + Vector3.right * spec.actionBarWidth * motor.ActionProgress);
+        actionBar.SetPosition(1, left + Vector3.right * spec.Style.actionBarWidth * motor.ActionProgress);
     }
 
     private void EnsureActionBar()
@@ -394,8 +466,8 @@ public class Operator : MonoBehaviour
             return;
         }
 
-        actionBarTrack = BuildBar("ActionBarTrack", spec.actionBarTrackColor, 0.09f, 107);
-        actionBar = BuildBar("ActionBar", spec.actionBarColor, 0.07f, 108);
+        actionBarTrack = BuildBar("ActionBarTrack", spec.Style.actionBarTrackColor, 0.09f, 107);
+        actionBar = BuildBar("ActionBar", spec.Style.actionBarColor, 0.07f, 108);
     }
 
     private LineRenderer BuildBar(string barName, Color color, float width, int sortingOrder)
@@ -430,8 +502,8 @@ public class Operator : MonoBehaviour
         lookMarker.widthMultiplier = 0.045f;
         lookMarker.positionCount = 0;
         lookMarker.material = new Material(Shader.Find("Sprites/Default"));
-        lookMarker.startColor = spec.lookMarkerColor;
-        lookMarker.endColor = spec.lookMarkerColor;
+        lookMarker.startColor = spec.Style.lookMarkerColor;
+        lookMarker.endColor = spec.Style.lookMarkerColor;
         lookMarker.sortingOrder = 103;
     }
 
@@ -457,21 +529,21 @@ public class Operator : MonoBehaviour
         lookRenderer.useWorldSpace = false;
         lookRenderer.positionCount = 2;
         lookRenderer.SetPosition(0, Vector3.zero);
-        lookRenderer.SetPosition(1, new Vector3(spec.lookLength, 0f, 0f));
+        lookRenderer.SetPosition(1, new Vector3(spec.Style.lookLength, 0f, 0f));
         lookRenderer.widthMultiplier = 0.05f;
         lookRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lookRenderer.startColor = spec.lookColor;
-        lookRenderer.endColor = spec.lookColor;
+        lookRenderer.startColor = spec.Style.lookColor;
+        lookRenderer.endColor = spec.Style.lookColor;
         lookRenderer.sortingOrder = 101;
 
         var gun = new GameObject("Gun");
         gun.transform.SetParent(rig, false);
-        gun.transform.localPosition = spec.gunOffset;
-        gun.transform.localScale = new Vector3(spec.gunSize.x, spec.gunSize.y, 1f);
+        gun.transform.localPosition = spec.Style.gunOffset;
+        gun.transform.localScale = new Vector3(spec.Style.gunSize.x, spec.Style.gunSize.y, 1f);
 
         var gunRenderer = gun.AddComponent<SpriteRenderer>();
-        gunRenderer.sprite = spec.gunSprite != null ? spec.gunSprite : GeneratedSprite();
-        gunRenderer.color = spec.gunColor;
+        gunRenderer.sprite = spec.Style.gunSprite != null ? spec.Style.gunSprite : GeneratedSprite();
+        gunRenderer.color = spec.Style.gunColor;
         gunRenderer.sortingOrder = 102;
     }
 

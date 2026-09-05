@@ -117,6 +117,9 @@ public static class OpeningActions
     {
         if (op == null || opening == null || navigation == null || !verb.IsValid)
         {
+            Debug.LogWarning(
+                $"{verb.Label}: refused, something is not wired — operator={op != null} "
+                + $"opening={opening != null} tilemap={navigation != null} verb={verb.IsValid}");
             return false;
         }
 
@@ -124,6 +127,7 @@ public static class OpeningActions
 
         if (plan == null)
         {
+            Debug.LogWarning($"{verb.Label}: refused, {op.name} has no path plan.", op);
             return false;
         }
 
@@ -147,6 +151,9 @@ public static class OpeningActions
         {
             if (!TryWalkTo(opening, navigation, anchor, reach, plan, out index))
             {
+                Debug.LogWarning(
+                    $"{verb.Label}: refused, no route from {anchor} to the {opening.name} at "
+                    + $"{opening.Cell}. Draw a path closer and order it again.", opening);
                 return false;
             }
         }
@@ -169,6 +176,7 @@ public static class OpeningActions
         waypoint.ActionDone = false;
 
         op.PathChanged();
+
         return true;
     }
 
@@ -192,11 +200,14 @@ public static class OpeningActions
             var target = centre + (Vector3)(offset.normalized * reach);
             target.z = anchor.z;
 
-            // Reach can fall short of the neighbouring cell, which would stop the operator inside
-            // the doorway itself. Where he actually ends up still has to be walkable.
+            // Reach can fall short of the neighbouring cell, which would leave him standing in the
+            // doorway itself — a cell that is not walkable while the door is shut, so the order
+            // would be refused outright. The cell beside it is what was meant either way, and
+            // snapping to it means a badly authored reach costs a step of accuracy, not the order.
             if (!NavigationQuery.IsWalkable(navigation, navigation.WorldToCell(target)))
             {
-                continue;
+                target = navigation.GetCellCenterWorld(side);
+                target.z = anchor.z;
             }
 
             var route = CellPathfinder.Find(navigation, anchor, target);

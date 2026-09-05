@@ -1,9 +1,11 @@
 {
-    "name": "Tacticore.Operators",
+    "name": "Tacticore.Vision",
     "rootNamespace": "",
     "references": [
         "Tacticore.Core",
-        "Tacticore.Paths",
+        "Tacticore.Grid",
+        "Tacticore.Operators",
+        "Unity.2D.Tilemap.Extras",
         "Tacticore.Data"
     ],
     "includePlatforms": [],

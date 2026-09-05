@@ -11,21 +11,15 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f9cf735e8c949d4fa0a46ea409ba890, type: 3}
   m_Name: Assaulter
-  m_EditorClassIdentifier: Tacticore.Operators::OperatorSpec
+  m_EditorClassIdentifier: Tacticore.Data::OperatorSpec
   displayName: ASSAULT
   walkSpeed: 2.6
   runSpeed: 4.4
   turnRate: 360
-  pickRadius: 0.45
-  lookLength: 0.95
-  lookColor: {r: 0.06, g: 0.06, b: 0.08, a: 0.9}
-  lookMarkerColor: {r: 1, g: 0.72, b: 0.27, a: 0.85}
-  lookMarkerSize: 0.16
+  openingReach: 0.9
   pathColor: {r: 0.498, g: 0.831, b: 1, a: 1}
-  pathMarkerSpacing: 2.2
-  pathMarkerSize: 0.28
-  pathSmoothing: 6
-  gunSprite: {fileID: 0}
-  gunOffset: {x: 0.16, y: -0.14}
-  gunSize: {x: 0.52, y: 0.1}
-  gunColor: {r: 0.13, g: 0.14, b: 0.16, a: 1}
+  coneColor: {r: 1, g: 0.863, b: 0.651, a: 0.075}
+  weapon: {fileID: 11400000, guid: fb322d1536dce4c43a60bea24ce59fdc, type: 2}
+  vision: {fileID: 11400000, guid: c52835b762ae2c446922607e3eb48e03, type: 2}
+  planning: {fileID: 11400000, guid: 7b4a2c7cfc404b54d89065c3717e3f20, type: 2}
+  style: {fileID: 11400000, guid: ccb9d432645c78944a09ee04e62e57f1, type: 2}

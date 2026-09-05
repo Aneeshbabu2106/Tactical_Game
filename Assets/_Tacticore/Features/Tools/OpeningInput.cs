@@ -14,6 +14,11 @@ public class OpeningInput : MonoBehaviour
     [SerializeField] private Tilemap navigation;
 
     [SerializeField] private Color hoverColor = new(1f, 0.85f, 0.35f, 0.9f);
+
+    [Tooltip("Outline colour when an order cannot be carried out - nothing can route to it.")]
+    [SerializeField] private Color refusedColor = new(1f, 0.35f, 0.32f, 0.95f);
+
+    [SerializeField] private float refusedSeconds = 0.8f;
     [SerializeField] private float hoverWidth = 0.05f;
 
     [Tooltip("A press that moves more than this is a drag, not a click on the opening.")]
@@ -25,6 +30,8 @@ public class OpeningInput : MonoBehaviour
     private LineRenderer outline;
     private Opening pressed;
     private Vector3 pressedAt;
+    private float refusedLeft;
+    private Opening refusedOn;
 
     /// <summary>
     ///     Set by the menu while it is showing. Its panel sits directly over the opening it belongs
@@ -58,7 +65,18 @@ public class OpeningInput : MonoBehaviour
         var cursor = pointer.WorldPosition;
         var opening = router.Kind == PointerTargetKind.Opening ? router.Opening : null;
 
-        DrawOutline(opening);
+        // A refusal outranks the hover: the cursor is on the menu panel when the order is turned
+        // down, so drawing only what is under it would show nothing at all.
+        if (refusedLeft > 0f)
+        {
+            refusedLeft -= Time.deltaTime;
+            DrawOutline(refusedOn, true);
+        }
+        else
+        {
+            refusedOn = null;
+            DrawOutline(opening, false);
+        }
 
         if (pointer.Pressed)
         {
@@ -98,7 +116,14 @@ public class OpeningInput : MonoBehaviour
         return OpeningActions.Queue(op, opening, verb, navigation);
     }
 
-    private void DrawOutline(Opening opening)
+    /// <summary>Flashes an opening's outline to say an order could not be carried out.</summary>
+    public void ShowRefused(Opening opening)
+    {
+        refusedOn = opening;
+        refusedLeft = refusedSeconds;
+    }
+
+    private void DrawOutline(Opening opening, bool refused)
     {
         if (outline == null)
         {
@@ -112,6 +137,9 @@ public class OpeningInput : MonoBehaviour
         }
 
         outline.enabled = true;
+
+        outline.startColor = refused ? refusedColor : hoverColor;
+        outline.endColor = outline.startColor;
 
         var centre = navigation.GetCellCenterWorld(opening.Cell);
         var half = (Vector3)navigation.cellSize * 0.5f;

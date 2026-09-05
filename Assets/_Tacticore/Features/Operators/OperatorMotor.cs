@@ -32,6 +32,12 @@ public class OperatorMotor
     /// <summary>Operator-wide pace, used on any leg whose waypoint does not ask to run.</summary>
     public bool Running { get; set; }
 
+    /// <summary>
+    ///     Stops him advancing without cancelling the route. Combat sets this while he is holding to
+    ///     shoot; clearing it puts him straight back on the path where he left it.
+    /// </summary>
+    public bool Holding { get; set; }
+
     public float TurnRate { get; set; } = 360f;
 
     public Vector3 Position { get; private set; }
@@ -146,7 +152,7 @@ public class OperatorMotor
                 elapsed = 0f;
             }
         }
-        else if (IsMoving)
+        else if (IsMoving && !Holding)
         {
             Position = Vector3.MoveTowards(Position, Plan.Points[next], SpeedNow() * deltaTime);
 

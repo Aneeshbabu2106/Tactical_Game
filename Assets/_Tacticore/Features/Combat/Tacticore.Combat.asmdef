@@ -1,9 +1,10 @@
 {
-    "name": "Tacticore.Operators",
+    "name": "Tacticore.Combat",
     "rootNamespace": "",
     "references": [
         "Tacticore.Core",
-        "Tacticore.Paths",
+        "Tacticore.Operators",
+        "Tacticore.Vision",
         "Tacticore.Data"
     ],
     "includePlatforms": [],
