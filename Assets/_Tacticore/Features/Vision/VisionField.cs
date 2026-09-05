@@ -29,6 +29,11 @@ public class VisionField : MonoBehaviour
     [Tooltip("Seconds between rescans of the scene, rather than searching it every frame.")]
     [SerializeField] private float rescanInterval = 0.5f;
 
+    [Header("Debug")]
+    [Tooltip("Shows every enemy regardless of who can see them. Safe to tick and untick while "
+             + "playing — it is read every frame, so it is a live switch rather than a setup step.")]
+    [SerializeField] private bool revealAll;
+
     /// <summary>One operator's sight this frame: the near circle and the directional cone.</summary>
     public sealed class Fan
     {
@@ -47,6 +52,17 @@ public class VisionField : MonoBehaviour
     ///     sweep the scene for him every frame.
     /// </summary>
     public Operator Selected { get; private set; }
+
+    /// <summary>
+    ///     Debug reveal. Backed by the serialized field so the inspector tick and anything that sets
+    ///     this agree — the field is pushed to <see cref="Spottable" /> every frame, so setting the
+    ///     flag directly on Spottable would be overwritten within the frame.
+    /// </summary>
+    public bool RevealAll
+    {
+        get => revealAll;
+        set => revealAll = value;
+    }
 
     public bool TryGetFan(Operator op, out Fan fan)
     {
@@ -72,6 +88,9 @@ public class VisionField : MonoBehaviour
         // Time, not SimClock: the look-target drag works while paused, so his facing — and what he
         // can see — changes while the simulation is held.
         Rescan();
+
+        // Driven from the field rather than set once, so the inspector tick is live during play.
+        Spottable.RevealAll = revealAll;
 
         Selected = null;
 
@@ -133,26 +152,37 @@ public class VisionField : MonoBehaviour
     /// </summary>
     public bool CanSee(Operator op, Vector3 point)
     {
-        var to = point - op.transform.position;
+        return CanSee(
+            op.transform.position, op.FacingDegrees, op.VisionFov, op.VisionRange,
+            op.VisionNearRadius, point);
+    }
+
+    /// <summary>
+    ///     The same question asked of a bare pair of eyes rather than an operator, so an enemy can
+    ///     use it too. Everything the operator overload knew was these five numbers.
+    /// </summary>
+    public bool CanSee(
+        Vector3 origin, float facingDegrees, float fovDegrees, float range, float nearRadius,
+        Vector3 point)
+    {
+        var to = point - origin;
         var distance = ((Vector2)to).magnitude;
 
-        if (distance > op.VisionRange)
+        if (distance > range)
         {
             return false;
         }
 
         var bearing = Mathf.Atan2(to.y, to.x) * Mathf.Rad2Deg;
-        var off = Mathf.Abs(Mathf.DeltaAngle(op.FacingDegrees, bearing));
+        var off = Mathf.Abs(Mathf.DeltaAngle(facingDegrees, bearing));
 
-        if (off > op.VisionFov * 0.5f && distance > op.VisionNearRadius)
+        // Inside the near radius he is aware in every direction, so the cone does not apply.
+        if (off > fovDegrees * 0.5f && distance > nearRadius)
         {
             return false;
         }
 
-        // Reuses the same march the cone is drawn from, so what is drawn and what is seen can never
-        // disagree: if sight stops short of the target, it is behind something.
-        var hit = VisionFan.CastRay(navigation, op.transform.position, bearing, op.VisionRange);
-
+        var hit = VisionFan.CastRay(navigation, origin, bearing, range);
         return hit.Distance >= distance - 0.01f;
     }
 

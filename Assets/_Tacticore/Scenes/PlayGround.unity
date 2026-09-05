@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &211872013
+--- !u!1 &44009763
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,63 +127,29 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 211872014}
-  - component: {fileID: 211872015}
-  - component: {fileID: 211872016}
+  - component: {fileID: 44009764}
   m_Layer: 0
-  m_Name: Enemy_Corridor
+  m_Name: P1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &211872014
+--- !u!4 &44009764
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 211872013}
+  m_GameObject: {fileID: 44009763}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.5, y: 4.5, z: 0}
+  m_LocalPosition: {x: -1.5, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2082798175}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &211872015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 211872013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bd40d9ba4c1e8a47a987a87463295b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tacticore.Vision::Spottable
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
-  visuals: []
-  placeholder: 1
-  placeholderColor: {r: 0.93, g: 0.29, b: 0.31, a: 1}
-  placeholderSize: 0.62
---- !u!114 &211872016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 211872013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 741fb955180aade43bb102d266ce3b45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tacticore.Combat::Health
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
-  maximum: 100
-  downedTint: {r: 0.32, g: 0.16, b: 0.18, a: 1}
 --- !u!1 &242055839
 GameObject:
   m_ObjectHideFlags: 0
@@ -376,71 +342,6 @@ MonoBehaviour:
   pointer: {fileID: 242055842}
   router: {fileID: 242055846}
   selectFirstAtStart: 1
---- !u!1 &360901211
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 360901212}
-  - component: {fileID: 360901213}
-  - component: {fileID: 360901214}
-  m_Layer: 0
-  m_Name: Enemy_AtShoulder
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &360901212
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 360901211}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 3.6, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &360901213
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 360901211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bd40d9ba4c1e8a47a987a87463295b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tacticore.Vision::Spottable
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
-  visuals: []
-  placeholder: 1
-  placeholderColor: {r: 0.93, g: 0.29, b: 0.31, a: 1}
-  placeholderSize: 0.62
---- !u!114 &360901214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 360901211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 741fb955180aade43bb102d266ce3b45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tacticore.Combat::Health
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
-  maximum: 100
-  downedTint: {r: 0.32, g: 0.16, b: 0.18, a: 1}
 --- !u!1 &441744930
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,6 +390,7 @@ MonoBehaviour:
   navigation: {fileID: 2093554710}
   coneCover: 0.32
   rescanInterval: 0.5
+  revealAll: 1
 --- !u!114 &441744933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -780,6 +682,7 @@ GameObject:
   - component: {fileID: 869531970}
   - component: {fileID: 869531972}
   - component: {fileID: 869531973}
+  - component: {fileID: 869531974}
   m_Layer: 0
   m_Name: Operator_01
   m_TagString: Untagged
@@ -891,7 +794,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Combat::OperatorCombat
   vision: {fileID: 441744932}
-  reactionTime: 0.35
+  reactionTime: 0.6
   tracerColor: {r: 1, g: 0.92, b: 0.62, a: 0.9}
   tracerSeconds: 0.05
   reloadBarWidth: 0.7
@@ -899,6 +802,116 @@ MonoBehaviour:
   reloadBarColor: {r: 1, g: 0.62, b: 0.3, a: 1}
   reloadBarTrackColor: {r: 0.1, g: 0.11, b: 0.13, a: 0.75}
   rescanInterval: 0.5
+--- !u!114 &869531974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 869531968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 741fb955180aade43bb102d266ce3b45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Combat::Health
+  spec: {fileID: 0}
+  maximum: 100
+  downedTint: {r: 0.32, g: 0.16, b: 0.18, a: 1}
+--- !u!1 &1011857449
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1011857450}
+  m_Layer: 0
+  m_Name: P1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1011857450
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1011857449}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.5, y: 0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1324272270}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1093429228
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1093429229}
+  m_Layer: 0
+  m_Name: P0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1093429229
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093429228}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.5, y: -2.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2082798175}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1119763001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1119763002}
+  m_Layer: 0
+  m_Name: Patrols
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1119763002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1119763001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1324272270}
+  - {fileID: 2082798175}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1283585979
 GameObject:
   m_ObjectHideFlags: 0
@@ -910,6 +923,10 @@ GameObject:
   - component: {fileID: 1283585980}
   - component: {fileID: 1283585981}
   - component: {fileID: 1283585982}
+  - component: {fileID: 1283585983}
+  - component: {fileID: 1283585984}
+  - component: {fileID: 1283585985}
+  - component: {fileID: 1283585986}
   m_Layer: 0
   m_Name: Enemy_RoomRight
   m_TagString: Untagged
@@ -944,9 +961,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd40d9ba4c1e8a47a987a87463295b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Vision::Spottable
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
   visuals: []
   placeholder: 1
+  spec: {fileID: 11400000, guid: d1d94e538e397924d9b20174ae5e778f, type: 2}
   placeholderColor: {r: 0.93, g: 0.29, b: 0.31, a: 1}
   placeholderSize: 0.62
 --- !u!114 &1283585982
@@ -961,9 +978,125 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 741fb955180aade43bb102d266ce3b45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Combat::Health
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
+  spec: {fileID: 11400000, guid: d1d94e538e397924d9b20174ae5e778f, type: 2}
   maximum: 100
   downedTint: {r: 0.32, g: 0.16, b: 0.18, a: 1}
+--- !u!114 &1283585983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283585979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab2b1133712b40b44914bd331a0a0fac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::Enemy
+  spec: {fileID: 11400000, guid: d1d94e538e397924d9b20174ae5e778f, type: 2}
+  homeFacing: 180
+--- !u!114 &1283585984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283585979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5219a22bc861e0a4a93cbf6da0b54b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyCombat
+  vision: {fileID: 441744932}
+  tracerColor: {r: 1, g: 0.45, b: 0.35, a: 0.9}
+  tracerSeconds: 0.05
+  rescanInterval: 0.5
+  breakOffDegrees: 25
+--- !u!114 &1283585985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283585979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b4745f0b7bc0944ab39234e7974743f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyBrain
+  navigation: {fileID: 2093554710}
+  route: {fileID: 1324272271}
+--- !u!114 &1283585986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283585979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 150f80175e9d90b4c9843b2038cc76d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyStateIcon
+  height: 0.55
+  size: 0.34
+  suspiciousColor: {r: 1, g: 0.85, b: 0.3, a: 1}
+  searchingColor: {r: 1, g: 0.55, b: 0.2, a: 1}
+  alertedColor: {r: 1, g: 0.3, b: 0.25, a: 1}
+  engagingColor: {r: 1, g: 0.15, b: 0.15, a: 1}
+  downedColor: {r: 0.62, g: 0.62, b: 0.65, a: 1}
+--- !u!1 &1324272269
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1324272270}
+  - component: {fileID: 1324272271}
+  m_Layer: 0
+  m_Name: Patrol_Gunman
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1324272270
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324272269}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1777404927}
+  - {fileID: 1011857450}
+  m_Father: {fileID: 1119763002}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1324272271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324272269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0c495857c8b7bf42b429b28542a41da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::PatrolRoute
+  arriveRadius: 0.6
+  dwellSeconds: 2.4
+  dwellJitter: 0.8
+  scanDegrees: 55
+  useAuthoredFacing: 0
+  gizmoColor: {r: 1, g: 0.45, b: 0.25, a: 0.9}
 --- !u!1 &1529411028
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,6 +1108,10 @@ GameObject:
   - component: {fileID: 1529411029}
   - component: {fileID: 1529411030}
   - component: {fileID: 1529411031}
+  - component: {fileID: 1529411032}
+  - component: {fileID: 1529411033}
+  - component: {fileID: 1529411034}
+  - component: {fileID: 1529411035}
   m_Layer: 0
   m_Name: Enemy_BehindWall
   m_TagString: Untagged
@@ -1009,9 +1146,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd40d9ba4c1e8a47a987a87463295b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Vision::Spottable
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
   visuals: []
   placeholder: 1
+  spec: {fileID: 11400000, guid: 9ec7a1ac0cd11f94ba84adb13264db27, type: 2}
   placeholderColor: {r: 0.93, g: 0.29, b: 0.31, a: 1}
   placeholderSize: 0.62
 --- !u!114 &1529411031
@@ -1026,9 +1163,73 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 741fb955180aade43bb102d266ce3b45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Combat::Health
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
+  spec: {fileID: 11400000, guid: 9ec7a1ac0cd11f94ba84adb13264db27, type: 2}
   maximum: 100
   downedTint: {r: 0.32, g: 0.16, b: 0.18, a: 1}
+--- !u!114 &1529411032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529411028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab2b1133712b40b44914bd331a0a0fac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::Enemy
+  spec: {fileID: 11400000, guid: 9ec7a1ac0cd11f94ba84adb13264db27, type: 2}
+  homeFacing: 180
+--- !u!114 &1529411033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529411028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5219a22bc861e0a4a93cbf6da0b54b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyCombat
+  vision: {fileID: 441744932}
+  tracerColor: {r: 1, g: 0.45, b: 0.35, a: 0.9}
+  tracerSeconds: 0.05
+  rescanInterval: 0.5
+  breakOffDegrees: 25
+--- !u!114 &1529411034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529411028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b4745f0b7bc0944ab39234e7974743f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyBrain
+  navigation: {fileID: 2093554710}
+  route: {fileID: 0}
+--- !u!114 &1529411035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529411028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 150f80175e9d90b4c9843b2038cc76d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyStateIcon
+  height: 0.55
+  size: 0.34
+  suspiciousColor: {r: 1, g: 0.85, b: 0.3, a: 1}
+  searchingColor: {r: 1, g: 0.55, b: 0.2, a: 1}
+  alertedColor: {r: 1, g: 0.3, b: 0.25, a: 1}
+  engagingColor: {r: 1, g: 0.15, b: 0.15, a: 1}
+  downedColor: {r: 0.62, g: 0.62, b: 0.65, a: 1}
 --- !u!1 &1716454984
 GameObject:
   m_ObjectHideFlags: 0
@@ -1040,6 +1241,10 @@ GameObject:
   - component: {fileID: 1716454985}
   - component: {fileID: 1716454986}
   - component: {fileID: 1716454987}
+  - component: {fileID: 1716454988}
+  - component: {fileID: 1716454989}
+  - component: {fileID: 1716454990}
+  - component: {fileID: 1716454991}
   m_Layer: 0
   m_Name: Enemy_RoomLeft
   m_TagString: Untagged
@@ -1074,9 +1279,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd40d9ba4c1e8a47a987a87463295b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Vision::Spottable
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
   visuals: []
   placeholder: 1
+  spec: {fileID: 11400000, guid: 4d73146fad0577146aa239ddce962bc2, type: 2}
   placeholderColor: {r: 0.93, g: 0.29, b: 0.31, a: 1}
   placeholderSize: 0.62
 --- !u!114 &1716454987
@@ -1091,9 +1296,104 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 741fb955180aade43bb102d266ce3b45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tacticore.Combat::Health
-  spec: {fileID: 11400000, guid: 2e33a306ca84fd345ab2cabb5f9b50a5, type: 2}
+  spec: {fileID: 11400000, guid: 4d73146fad0577146aa239ddce962bc2, type: 2}
   maximum: 100
   downedTint: {r: 0.32, g: 0.16, b: 0.18, a: 1}
+--- !u!114 &1716454988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1716454984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab2b1133712b40b44914bd331a0a0fac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::Enemy
+  spec: {fileID: 11400000, guid: 4d73146fad0577146aa239ddce962bc2, type: 2}
+  homeFacing: -135
+--- !u!114 &1716454989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1716454984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5219a22bc861e0a4a93cbf6da0b54b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyCombat
+  vision: {fileID: 441744932}
+  tracerColor: {r: 1, g: 0.45, b: 0.35, a: 0.9}
+  tracerSeconds: 0.05
+  rescanInterval: 0.5
+  breakOffDegrees: 25
+--- !u!114 &1716454990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1716454984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b4745f0b7bc0944ab39234e7974743f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyBrain
+  navigation: {fileID: 2093554710}
+  route: {fileID: 2082798176}
+--- !u!114 &1716454991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1716454984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 150f80175e9d90b4c9843b2038cc76d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::EnemyStateIcon
+  height: 0.55
+  size: 0.34
+  suspiciousColor: {r: 1, g: 0.85, b: 0.3, a: 1}
+  searchingColor: {r: 1, g: 0.55, b: 0.2, a: 1}
+  alertedColor: {r: 1, g: 0.3, b: 0.25, a: 1}
+  engagingColor: {r: 1, g: 0.15, b: 0.15, a: 1}
+  downedColor: {r: 0.62, g: 0.62, b: 0.65, a: 1}
+--- !u!1 &1777404926
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1777404927}
+  m_Layer: 0
+  m_Name: P0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1777404927
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1777404926}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.5, y: -2.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1324272270}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1920317320
 GameObject:
   m_ObjectHideFlags: 0
@@ -1171,6 +1471,58 @@ Transform:
   - {fileID: 869531969}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2082798174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2082798175}
+  - component: {fileID: 2082798176}
+  m_Layer: 0
+  m_Name: Patrol_Thug
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2082798175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082798174}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1093429229}
+  - {fileID: 44009764}
+  m_Father: {fileID: 1119763002}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2082798176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082798174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0c495857c8b7bf42b429b28542a41da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tacticore.Enemies::PatrolRoute
+  arriveRadius: 0.6
+  dwellSeconds: 2.4
+  dwellJitter: 0.8
+  scanDegrees: 55
+  useAuthoredFacing: 0
+  gizmoColor: {r: 1, g: 0.45, b: 0.25, a: 0.9}
 --- !u!1 &2093554707
 GameObject:
   m_ObjectHideFlags: 0
@@ -5036,8 +5388,7 @@ SceneRoots:
   - {fileID: 1950291968}
   - {fileID: 242055840}
   - {fileID: 441744931}
-  - {fileID: 211872014}
   - {fileID: 1283585980}
   - {fileID: 1716454985}
   - {fileID: 1529411029}
-  - {fileID: 360901212}
+  - {fileID: 1119763002}

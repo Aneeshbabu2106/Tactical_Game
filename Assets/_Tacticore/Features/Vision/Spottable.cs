@@ -27,7 +27,16 @@ public class Spottable : MonoBehaviour
 
     private static Sprite disc;
 
+    /// <summary>
+    ///     Once true this never hides again. A body is evidence: you cleared that room, and the map
+    ///     should go on saying so after you have walked away from it.
+    /// </summary>
+    public bool IsRevealed { get; private set; }
+
     public bool IsVisible { get; private set; }
+
+    /// <summary>Debug switch. While set every Spottable shows regardless of who can see it.</summary>
+    public static bool RevealAll { get; set; }
 
     private void Awake()
     {
@@ -46,10 +55,24 @@ public class Spottable : MonoBehaviour
         // and would leave the renderers on.
         IsVisible = false;
         Apply();
+
+        if (TryGetComponent(out Health health))
+        {
+            health.Died += _ => Reveal();
+        }
+    }
+
+    /// <summary>Pins this visible for the rest of the mission.</summary>
+    public void Reveal()
+    {
+        IsRevealed = true;
+        SetVisible(true);
     }
 
     public void SetVisible(bool visible)
     {
+        visible |= IsRevealed || RevealAll;
+
         if (IsVisible == visible)
         {
             return;

@@ -23,8 +23,9 @@ public class OperatorCombat : MonoBehaviour
     [SerializeField] private VisionField vision;
 
     [Tooltip("Seconds between a target coming into view and the first round leaving. The prototype "
-             + "spends this in a decide/turn/settle/aim pipeline.")]
-    [SerializeField] private float reactionTime = 0.35f;
+             + "spends this in a decide/turn/settle/aim pipeline which totals about 0.58s against a "
+             + "target already dead ahead — 0.35 gave him a head start no enemy could survive.")]
+    [SerializeField] private float reactionTime = 0.6f;
 
     [SerializeField] private Color tracerColor = new(1f, 0.92f, 0.62f, 0.9f);
     [SerializeField] private float tracerSeconds = 0.05f;
@@ -85,8 +86,9 @@ public class OperatorCombat : MonoBehaviour
         Weapon.Tick(dt);
         RedrawReloadBar();
 
-        if (dt <= 0f)
+        if (dt <= 0f || !self.IsAlive)
         {
+            target = null;
             return;
         }
 
@@ -182,10 +184,11 @@ public class OperatorCombat : MonoBehaviour
         var chance = self.WeaponAccuracy * (distance > self.WeaponRange * 0.7f ? 0.55f : 1f);
 
         ShowTracer(at.transform.position);
+        Noise.Emit(transform.position, Noise.Gunshot, this);
 
         if (Random.value <= chance)
         {
-            at.TakeDamage(self.WeaponDamage);
+            at.TakeDamage(self.WeaponDamage, gameObject);
         }
     }
 

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a967250cf60529845816b61b7d3fc01d, type: 3}
+  m_Name: Thug
+  m_EditorClassIdentifier: Tacticore.Data::EnemySpec
+  displayName: THUG
+  maxHealth: 44
+  armour: 0
+  downedTint: {r: 0.32, g: 0.16, b: 0.18, a: 1}
+  accuracy: 0.42
+  damageMultiplier: 0.9
+  moveSpeed: 2.3
+  markerColor: {r: 1, g: 0.478, b: 0.478, a: 1}
+  markerSize: 0.56
+  gunOffset: {x: 0.16, y: -0.14}
+  gunSize: {x: 0.34, y: 0.08}
+  gunColor: {r: 0.13, g: 0.14, b: 0.16, a: 1}
+  weapon: {fileID: 11400000, guid: 9348937fc48a1e64c8d886027d08f8ea, type: 2}
+  vision: {fileID: 11400000, guid: bdfb3b56c12b2744584cc1eaf98d1a17, type: 2}
+  alert: {fileID: 11400000, guid: a4038dd856eb17d4b96da0be3ce8309f, type: 2}

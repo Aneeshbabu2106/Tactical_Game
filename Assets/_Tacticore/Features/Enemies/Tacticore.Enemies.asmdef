@@ -1,0 +1,23 @@
+{
+    "name": "Tacticore.Enemies",
+    "rootNamespace": "",
+    "references": [
+        "Tacticore.Core",
+        "Tacticore.Data",
+        "Tacticore.Grid",
+        "Tacticore.Paths",
+        "Tacticore.Operators",
+        "Tacticore.Vision",
+        "Tacticore.Combat",
+        "Unity.2D.Tilemap.Extras"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

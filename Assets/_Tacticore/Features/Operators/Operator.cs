@@ -13,10 +13,16 @@ public class Operator : MonoBehaviour
     [SerializeField] private LineRenderer pathLine;
     [SerializeField] private LineRenderer lookMarker;
 
+    /// <summary>Distance between footfalls, from the prototype's step accumulator.</summary>
+    private const float StepSpacing = 0.9f;
+
     private static Sprite generatedSprite;
+
+    private float stepAccum;
 
     private OperatorMotor motor;
     private Transform rig;
+    private Health health;
 
     // Reused every frame; smoothing a path per frame would otherwise churn the heap.
     private readonly List<Vector3> pathBuffer = new();
@@ -30,6 +36,12 @@ public class Operator : MonoBehaviour
     private LineRenderer actionBarTrack;
 
     public OperatorMotor Motor => motor;
+
+    /// <summary>
+    ///     A dead operator is not an instrument. Nothing may be drawn for him, he does not walk, and
+    ///     he does not shoot — without this the player carries on giving orders to a corpse.
+    /// </summary>
+    public bool IsAlive => health == null || health.IsAlive;
 
     public float FacingDegrees => motor?.FacingDegrees ?? 0f;
 
@@ -157,6 +169,8 @@ public class Operator : MonoBehaviour
             return;
         }
 
+        health = GetComponent<Health>();
+
         motor = new OperatorMotor(transform.position)
         {
             WalkSpeed = spec.walkSpeed,
@@ -173,8 +187,20 @@ public class Operator : MonoBehaviour
 
     private void Update()
     {
+        if (!IsAlive)
+        {
+            motor.ClearPath();
+            RedrawPath();
+            RedrawLookMarker();
+            RedrawActionBar();
+            return;
+        }
+
         // SimClock, not Time: paused feeds zero so the operator holds while the player plans.
+        var was = motor.Position;
+
         motor.Tick(SimClock.DeltaTime);
+        Footsteps(Vector3.Distance(motor.Position, was));
         ApplyMotorState();
         RedrawPath();
         RedrawLookMarker();
@@ -212,6 +238,32 @@ public class Operator : MonoBehaviour
     {
         motor.ClearPath();
         RedrawPath();
+    }
+
+    /// <summary>
+    ///     Running is heard; walking is not. The prototype emits a step every 0.9 units at a
+    ///     loudness that depends on the pace, and a walk step is quiet enough that nobody ever makes
+    ///     it out — which is exactly what makes the run toggle a decision rather than a convenience.
+    /// </summary>
+    private void Footsteps(float travelled)
+    {
+        // The squad-wide toggle or this leg's own waypoint asking to run — either counts.
+        var running = motor.Running || motor.CurrentWaypoint is { Run: true };
+
+        if (travelled <= 0f || !running)
+        {
+            return;
+        }
+
+        stepAccum += travelled;
+
+        if (stepAccum < StepSpacing)
+        {
+            return;
+        }
+
+        stepAccum -= StepSpacing;
+        Noise.Emit(transform.position, Noise.RunStep, this);
     }
 
     private void ApplyMotorState()

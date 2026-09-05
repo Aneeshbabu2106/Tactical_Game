@@ -96,7 +96,7 @@ public class PointerRouter : MonoBehaviour
 
         foreach (var op in operators)
         {
-            if (op == null || op.Plan == null)
+            if (op == null || !op.IsAlive || op.Plan == null)
             {
                 continue;
             }
@@ -165,7 +165,7 @@ public class PointerRouter : MonoBehaviour
 
         foreach (var op in operators)
         {
-            if (op == null || op.Plan == null || op.Plan.Points.Count < 2)
+            if (op == null || !op.IsAlive || op.Plan == null || op.Plan.Points.Count < 2)
             {
                 continue;
             }

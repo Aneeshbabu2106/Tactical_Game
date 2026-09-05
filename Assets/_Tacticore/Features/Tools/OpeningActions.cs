@@ -9,10 +9,13 @@ using UnityEngine.Tilemaps;
 /// </summary>
 public readonly struct OpeningVerb
 {
-    public OpeningVerb(string label, float duration, Predicate<Opening> available, Action<Opening> apply)
+    public OpeningVerb(
+        string label, float duration, float loudness, Predicate<Opening> available,
+        Action<Opening> apply)
     {
         Label = label;
         Duration = duration;
+        Loudness = loudness;
         this.available = available;
         this.apply = apply;
     }
@@ -24,6 +27,9 @@ public readonly struct OpeningVerb
 
     /// <summary>Seconds of simulated time the operator spends on it.</summary>
     public float Duration { get; }
+
+    /// <summary>How far the doing of it carries. The reason KICK is not simply a faster OPEN.</summary>
+    public float Loudness { get; }
 
     public bool IsValid => apply != null;
 
@@ -52,18 +58,19 @@ public static class OpeningActions
     ///     Availability is driven entirely by state, and every verb here is one-way: once a door is
     ///     open or a pane is broken the opening has nothing left to offer and stops responding to
     ///     clicks altogether. The prototype's fuller set — try handle, pick lock, wedge, the
-    ///     breaching charges — waits on the lock, kit and noise systems that do not exist yet.
+    ///     breaching charges — waits on the lock and kit systems that do not exist yet.
     /// </summary>
     private static readonly OpeningVerb[] Verbs =
     {
-        new("OPEN", 1.4f,
+        new("OPEN", 1.4f, Noise.DoorOpen,
             o => o is Door { IsOpen: false }, o => ((Door)o).Open()),
 
-        // Same outcome as OPEN for now, at half the time. It earns its cost once noise carries.
-        new("KICK", 0.7f,
+        // The same outcome as OPEN in half the time, paid for in noise: this is heard across most
+        // of the map and sends anyone who hears it to the door.
+        new("KICK", 0.7f, Noise.DoorKick,
             o => o is Door { IsOpen: false }, o => ((Door)o).Open()),
 
-        new("BREAK GLASS", 0.9f,
+        new("BREAK GLASS", 0.9f, Noise.GlassBreak,
             o => o is Window { IsBroken: false }, o => ((Window)o).Break())
     };
 
@@ -304,9 +311,15 @@ public class OpeningAction : IWaypointAction
 
     public void Perform()
     {
-        if (opening != null)
+        if (opening == null)
         {
-            verb.Apply(opening);
+            return;
         }
+
+        verb.Apply(opening);
+
+        // From the opening, not the operator: what carries is the door coming in, and that is
+        // where anyone who hears it will come looking.
+        Noise.Emit(opening.transform.position, verb.Loudness, opening);
     }
 }

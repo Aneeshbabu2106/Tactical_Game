@@ -12,6 +12,11 @@ public static class OperatorPicker
 
         foreach (var candidate in Object.FindObjectsByType<Operator>(FindObjectsSortMode.None))
         {
+            if (!candidate.IsAlive)
+            {
+                continue;
+            }
+
             // 2D: the operator sprite may sit on any z for sorting, the cursor is always on z 0.
             var distance = Vector2.Distance(candidate.transform.position, worldPosition);
 
@@ -36,6 +41,11 @@ public static class OperatorPicker
 
         foreach (var candidate in Object.FindObjectsByType<Operator>(FindObjectsSortMode.None))
         {
+            if (!candidate.IsAlive)
+            {
+                continue;
+            }
+
             var distance = Vector2.Distance(candidate.transform.position, worldPosition);
 
             if (distance < bestDistance)
