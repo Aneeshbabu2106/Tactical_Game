@@ -26,6 +26,13 @@ public class Health : MonoBehaviour
 
     public float Current { get; private set; }
 
+    /// <summary>
+    ///     What he started with, after the spec has had its say. Exposed so a bar can be drawn
+    ///     without the caller having to know whether the number came from the spec or the inline
+    ///     fallback.
+    /// </summary>
+    public float Maximum { get; private set; }
+
     public bool IsAlive => Current > 0f;
 
     /// <summary>Raised once, on the hit that puts this down.</summary>
@@ -40,7 +47,8 @@ public class Health : MonoBehaviour
 
     private void Awake()
     {
-        Current = spec != null ? spec.maxHealth : maximum;
+        Maximum = spec != null ? spec.maxHealth : maximum;
+        Current = Maximum;
     }
 
     public void TakeDamage(float amount)

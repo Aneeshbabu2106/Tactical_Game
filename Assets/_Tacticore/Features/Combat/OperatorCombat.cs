@@ -59,6 +59,9 @@ public class OperatorCombat : MonoBehaviour
     /// <summary>Rounds sent this mission. The end-of-mission stats will want it.</summary>
     public int ShotsFired { get; private set; }
 
+    /// <summary>Rounds that landed, so the results screen can report accuracy honestly.</summary>
+    public int Hits { get; private set; }
+
     /// <summary>What he is shooting at, or null. For the UI and, later, for callouts.</summary>
     public Health Target => target;
 
@@ -71,10 +74,19 @@ public class OperatorCombat : MonoBehaviour
             vision = FindFirstObjectByType<VisionField>();
         }
 
-        Weapon = new Weapon(self.MagazineSize, self.RoundsPerMinute, self.ReloadSeconds);
+        Rearm();
 
         BuildTracer();
         BuildReloadBar();
+    }
+
+    /// <summary>
+    ///     Builds the weapon from whatever the operator is carrying now. Deployment issues a weapon
+    ///     after Awake has already run, so this has to be callable again rather than only at wake.
+    /// </summary>
+    public void Rearm()
+    {
+        Weapon = new Weapon(self.MagazineSize, self.RoundsPerMinute, self.ReloadSeconds);
     }
 
     private void Update()
@@ -188,6 +200,7 @@ public class OperatorCombat : MonoBehaviour
 
         if (Random.value <= chance)
         {
+            Hits++;
             at.TakeDamage(self.WeaponDamage, gameObject);
         }
     }

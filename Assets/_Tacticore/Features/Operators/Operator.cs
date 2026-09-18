@@ -10,6 +10,9 @@ using UnityEngine;
 public class Operator : MonoBehaviour
 {
     [SerializeField] private OperatorSpec spec;
+
+    [Tooltip("Who this man is: number, portrait, card colour and kit. Optional; the card falls back to defaults.")]
+    [SerializeField] private OperatorProfile profile;
     [SerializeField] private LineRenderer pathLine;
     [SerializeField] private LineRenderer lookMarker;
 
@@ -23,6 +26,7 @@ public class Operator : MonoBehaviour
     private OperatorMotor motor;
     private Transform rig;
     private Health health;
+    private WeaponSpec weaponOverride;
 
     // Reused every frame; smoothing a path per frame would otherwise churn the heap.
     private readonly List<Vector3> pathBuffer = new();
@@ -59,17 +63,17 @@ public class Operator : MonoBehaviour
 
     public float VisionFov => spec != null ? spec.Vision.fovDegrees : 120f;
 
-    public float WeaponDamage => spec != null ? spec.Weapon.damage : 34f;
+    public float WeaponDamage => Weapon != null ? Weapon.damage : 34f;
 
-    public float RoundsPerMinute => spec != null ? spec.Weapon.roundsPerMinute : 750f;
+    public float RoundsPerMinute => Weapon != null ? Weapon.roundsPerMinute : 750f;
 
-    public int MagazineSize => spec != null ? spec.Weapon.magazineSize : 30;
+    public int MagazineSize => Weapon != null ? Weapon.magazineSize : 30;
 
-    public float ReloadSeconds => spec != null ? spec.Weapon.reloadSeconds : 2f;
+    public float ReloadSeconds => Weapon != null ? Weapon.reloadSeconds : 2f;
 
-    public float WeaponRange => spec != null ? spec.Weapon.range : 12f;
+    public float WeaponRange => Weapon != null ? Weapon.range : 12f;
 
-    public float WeaponAccuracy => spec != null ? spec.Weapon.accuracy : 0.66f;
+    public float WeaponAccuracy => Weapon != null ? Weapon.accuracy : 0.66f;
 
     public float VisionRange => spec != null ? spec.Vision.range : 12f;
 
@@ -85,6 +89,29 @@ public class Operator : MonoBehaviour
     ///     overlapping wedges.
     /// </summary>
     public bool IsSelected { get; private set; }
+
+    /// <summary>The class name, for the interface. Falls back to the object's own name.</summary>
+    public string DisplayName => spec != null ? spec.displayName : name;
+
+    /// <summary>His card identity, or null if none has been given.</summary>
+    public OperatorProfile Profile => profile;
+
+    /// <summary>
+    ///     What he is actually carrying. Deployment can hand him something other than the class
+    ///     default, and it must not write that back onto the shared spec asset — a weapon picked for
+    ///     one run would otherwise still be there on the next, and in the project on disk.
+    /// </summary>
+    public WeaponSpec Weapon =>
+        weaponOverride != null ? weaponOverride : spec != null ? spec.Weapon : null;
+
+    /// <summary>What he is carrying, for the interface.</summary>
+    public string WeaponName => Weapon != null ? Weapon.displayName : "—";
+
+    /// <summary>Issues a weapon for this run. Null puts him back on the class default.</summary>
+    public void SetWeapon(WeaponSpec weapon)
+    {
+        weaponOverride = weapon;
+    }
 
     public void SetSelected(bool selected)
     {
