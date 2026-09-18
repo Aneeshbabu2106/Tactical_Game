@@ -109,3 +109,9 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Unity crash-recovery copies and scratch screenshots
+/Assets/_Recovery/
+/Assets/_Recovery.meta
+/Assets/_Shot/
+/Assets/_Shot.meta
