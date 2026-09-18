@@ -19,3 +19,4 @@ MonoBehaviour:
   reloadSeconds: 2
   range: 12
   accuracy: 0.66
+  icon: {fileID: 2800000, guid: d3bac3dff44a520a66401e6742b9f664, type: 3}

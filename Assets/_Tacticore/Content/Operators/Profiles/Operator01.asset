@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61cfa54ca6b7a6245924fbb632ff023b, type: 3}
+  m_Name: Operator01
+  m_EditorClassIdentifier: Tacticore.Data::OperatorProfile
+  callsign: RUIZ
+  number: '01'
+  portrait: {fileID: 2800000, guid: eb3a0e9fc0732413801ea3921f3ce4ab, type: 3}
+  accent: {r: 0.25, g: 0.72, b: 1, a: 1}
+  armor: 30
+  items:
+  - {fileID: 11400000, guid: 184f9d56a540cc2fd1f0640aa2a11a29, type: 2}
+  - {fileID: 11400000, guid: 6c231b7414b7c46418df145082f85e0f, type: 2}
+  - {fileID: 11400000, guid: 67e87a1f4f18337a02293e419069e0af, type: 2}
+  - {fileID: 11400000, guid: a3c9d3dc29cceb4c00e63af06e9de6a7, type: 2}

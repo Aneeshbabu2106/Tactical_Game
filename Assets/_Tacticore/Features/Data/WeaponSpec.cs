@@ -27,4 +27,8 @@ public class WeaponSpec : ScriptableObject
     [Tooltip("Chance to hit at comfortable range. Falls to 55% of this past 70% of the range.")]
     [Range(0f, 1f)]
     public float accuracy = 0.66f;
+
+    [Header("Interface")]
+    [Tooltip("Side-on silhouette, white or light grey on transparent. The deployment card tints it.")]
+    public Texture2D icon;
 }
