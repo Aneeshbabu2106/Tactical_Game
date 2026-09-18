@@ -1,0 +1,21 @@
+{
+    "name": "Tacticore.Mission",
+    "rootNamespace": "",
+    "references": [
+        "Tacticore.Core",
+        "Tacticore.Data",
+        "Tacticore.Operators",
+        "Tacticore.Combat",
+        "Tacticore.Enemies",
+        "Tacticore.Input"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
