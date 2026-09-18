@@ -36,6 +36,18 @@ public class EnemyStateIcon : MonoBehaviour
     private static Sprite bang;
     private static Sprite cross;
 
+    /// <summary>
+    ///     Domain reload is off, so these would carry a previous play session's sprites into the
+    ///     next, where they no longer draw. Rebuilt per session instead.
+    /// </summary>
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        question = null;
+        bang = null;
+        cross = null;
+    }
+
     private Enemy self;
     private EnemyBrain brain;
     private EnemyCombat combat;
@@ -101,7 +113,7 @@ public class EnemyStateIcon : MonoBehaviour
 
     private static Sprite Question()
     {
-        return question ??= Build(new[]
+        return question = question != null ? question : Build(new[]
         {
             ".#####.",
             "##...##",
@@ -117,7 +129,7 @@ public class EnemyStateIcon : MonoBehaviour
 
     private static Sprite Bang()
     {
-        return bang ??= Build(new[]
+        return bang = bang != null ? bang : Build(new[]
         {
             "...##..",
             "...##..",
@@ -133,7 +145,7 @@ public class EnemyStateIcon : MonoBehaviour
 
     private static Sprite Cross()
     {
-        return cross ??= Build(new[]
+        return cross = cross != null ? cross : Build(new[]
         {
             ".......",
             "##...##",
