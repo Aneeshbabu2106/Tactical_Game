@@ -45,6 +45,21 @@ public class PointerInput : MonoBehaviour
     /// <summary>False when there is no mouse or no camera, so consumers can bail cleanly.</summary>
     public bool IsAvailable { get; private set; }
 
+    /// <summary>
+    ///     Asked whether a screen position is over the interface. Set by the HUD, which is the only
+    ///     thing that knows where its panels are.
+    /// </summary>
+    /// <remarks>
+    ///     A delegate rather than a reference to the HUD, so Input stays the bottom of the stack and
+    ///     goes on knowing nothing about what is drawn on top of it. Only the press edges are
+    ///     swallowed: a drag already under way when the cursor crosses a panel still finishes, which
+    ///     is what you want when a path is drawn near the edge of the screen.
+    /// </remarks>
+    public System.Func<Vector2, bool> UiBlocksPointer { get; set; }
+
+    /// <summary>True while the cursor is over the interface. For anything that wants to know.</summary>
+    public bool OverUi { get; private set; }
+
     private void Awake()
     {
         if (view == null)
@@ -76,6 +91,8 @@ public class PointerInput : MonoBehaviour
 
         ScreenPosition = mouse.position.ReadValue();
 
+        OverUi = UiBlocksPointer != null && UiBlocksPointer(ScreenPosition);
+
         var world = view.ScreenToWorldPoint(ScreenPosition);
         world.z = 0f;
         WorldPosition = world;
@@ -84,15 +101,17 @@ public class PointerInput : MonoBehaviour
         // while trackpads still come through proportionally as fractions.
         Scroll = mouse.scroll.ReadValue().y / 120f;
 
-        Pressed = mouse.leftButton.wasPressedThisFrame;
+        // Presses are swallowed over the interface so a click on a panel does not also start a
+        // gesture in the world underneath it. Held and Released are left alone deliberately.
+        Pressed = !OverUi && mouse.leftButton.wasPressedThisFrame;
         Held = mouse.leftButton.isPressed;
         Released = mouse.leftButton.wasReleasedThisFrame;
 
-        RightPressed = mouse.rightButton.wasPressedThisFrame;
+        RightPressed = !OverUi && mouse.rightButton.wasPressedThisFrame;
         RightHeld = mouse.rightButton.isPressed;
         RightReleased = mouse.rightButton.wasReleasedThisFrame;
 
-        MiddlePressed = mouse.middleButton.wasPressedThisFrame;
+        MiddlePressed = !OverUi && mouse.middleButton.wasPressedThisFrame;
         MiddleHeld = mouse.middleButton.isPressed;
         MiddleReleased = mouse.middleButton.wasReleasedThisFrame;
     }
