@@ -1,61 +1,41 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-///     A small action panel that opens above an operator on right-click and closes when you click
-///     away from it.
+///     Decides what the context menu offers and what it is anchored to. The drawing is
+///     <see cref="ActionMenuView" />'s.
 /// </summary>
 /// <remarks>
-///     Drawn with IMGUI and hit-tested against <see cref="PointerInput" /> rather than built from
-///     uGUI. The scene has no Canvas or EventSystem, and standing those up — plus an
-///     InputSystemUIInputModule, since the old Input Manager is disabled — is a lot of apparatus for
-///     a placeholder menu. Hit-testing through PointerInput also keeps every click in this project
-///     on one code path.
+///     Split that way because the two halves fail differently. What a door offers depends on its
+///     state and changes every frame; where the panel goes and how a press resolves is a UI Toolkit
+///     concern and belongs with the panel. Keeping them in one IMGUI file is what let a hand-rolled
+///     hit test drift out of step with the rows it was testing.
 /// </remarks>
 public class OperatorActionMenu : MonoBehaviour
 {
+    [SerializeField] private GameplayHud hud;
     [SerializeField] private OperatorPathInput pathInput;
     [SerializeField] private WaypointInput waypointInput;
     [SerializeField] private OpeningInput openingInput;
+    [SerializeField] private PointerInput pointer;
     [SerializeField] private Camera view;
 
-    [Header("Layout, in pixels")]
-    [SerializeField] private float panelWidth = 158f;
-
-    [Tooltip("Height of one row. The panel is sized from this and the number of rows, so a door "
-             + "with two verbs is not stretched to the height of the operator's four.")]
-    [SerializeField] private float rowHeight = 26f;
-
-    [SerializeField] private float gapAboveOperator = 22f;
-    [SerializeField] private float padding = 6f;
-
-    private readonly List<Row> rows = new();
-    private readonly List<Rect> rowRects = new();
+    private readonly List<ActionRow> rows = new();
 
     private Operator target;
     private Waypoint waypoint;
     private Opening opening;
-    private Rect panel;
-
-    private readonly struct Row
-    {
-        public Row(string label, bool enabled, Action action)
-        {
-            Label = label;
-            Enabled = enabled;
-            Action = action;
-        }
-
-        public string Label { get; }
-        public bool Enabled { get; }
-        public Action Action { get; }
-    }
+    private int openedOnFrame = -1;
 
     public bool IsOpen => target != null;
 
     private void Awake()
     {
+        if (hud == null)
+        {
+            hud = FindFirstObjectByType<GameplayHud>();
+        }
+
         if (pathInput == null)
         {
             pathInput = FindFirstObjectByType<OperatorPathInput>();
@@ -71,6 +51,10 @@ public class OperatorActionMenu : MonoBehaviour
             openingInput = FindFirstObjectByType<OpeningInput>();
         }
 
+        if (pointer == null)
+        {
+            pointer = FindFirstObjectByType<PointerInput>();
+        }
 
         if (view == null)
         {
@@ -112,9 +96,11 @@ public class OperatorActionMenu : MonoBehaviour
         {
             openingInput.OpeningClicked -= OpenForOpening;
         }
+
+        hud?.Menu?.Hide();
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         // Tells the opening tool to sit out while this panel is up: it covers the very cell that
         // opened it, so a click on a row would otherwise be read as another click on the door.
@@ -123,9 +109,16 @@ public class OperatorActionMenu : MonoBehaviour
             openingInput.Suppressed = IsOpen;
         }
 
-        // The operator can be destroyed while its menu is up.
-        if (target == null)
+        if (hud == null || hud.Menu == null)
         {
+            return;
+        }
+
+        // The operator can be destroyed, or shot, while his menu is up.
+        if (target == null || !target.IsAlive)
+        {
+            Close();
+            hud.Menu.Hide();
             return;
         }
 
@@ -133,50 +126,22 @@ public class OperatorActionMenu : MonoBehaviour
         if (opening != null && !OpeningActions.HasAny(opening))
         {
             Close();
+            hud.Menu.Hide();
             return;
         }
 
-        Layout();
-    }
-
-    private void OnGUI()
-    {
-        if (target == null)
-        {
-            return;
-        }
-
-        GUI.Box(panel, GUIContent.none);
-
-        for (var i = 0; i < rows.Count && i < rowRects.Count; i++)
-        {
-            var row = rows[i];
-
-            // A real IMGUI button rather than a box plus a hand-rolled hit test. It resolves the
-            // press inside the GUI event loop, in GUI coordinates, so nothing depends on my
-            // converting a pointer position into them correctly — which is what stopped these
-            // responding at all.
-            GUI.enabled = row.Enabled;
-            var pressed = GUI.Button(rowRects[i], row.Label);
-            GUI.enabled = true;
-
-            if (!pressed)
-            {
-                continue;
-            }
-
-            // The action may close this menu, which empties the rows mid-draw.
-            row.Action();
-            return;
-        }
-
-        // Closing is handled here too, in the same coordinates the buttons use. Event.current
-        // already carries a GUI-space mouse position, so there is no conversion to get wrong. A
-        // click the buttons consumed arrives as EventType.Used and leaves this alone.
-        if (Event.current.type == EventType.MouseDown && !panel.Contains(Event.current.mousePosition))
+        // A press anywhere in the world closes it. Presses that land on a panel never reach here at
+        // all — PointerInput swallows those — so this needs no hit test of its own. The frame guard
+        // is for the press that opened the menu in the first place.
+        if (pointer != null && pointer.Pressed && Time.frameCount != openedOnFrame)
         {
             Close();
+            hud.Menu.Hide();
+            return;
         }
+
+        BuildRows();
+        hud.Menu.Show(rows, view.WorldToScreenPoint(Anchor()));
     }
 
     public void OpenForOperator(Operator op)
@@ -184,6 +149,7 @@ public class OperatorActionMenu : MonoBehaviour
         target = op;
         waypoint = null;
         opening = null;
+        openedOnFrame = Time.frameCount;
     }
 
     public void OpenForWaypoint(Operator op, Waypoint wp)
@@ -191,6 +157,7 @@ public class OperatorActionMenu : MonoBehaviour
         target = op;
         waypoint = wp;
         opening = null;
+        openedOnFrame = Time.frameCount;
     }
 
     public void OpenForOpening(Operator op, Opening hit)
@@ -198,6 +165,7 @@ public class OperatorActionMenu : MonoBehaviour
         target = op;
         waypoint = null;
         opening = hit;
+        openedOnFrame = Time.frameCount;
     }
 
     public void Close()
@@ -207,9 +175,25 @@ public class OperatorActionMenu : MonoBehaviour
         opening = null;
     }
 
+    /// <summary>What the panel points at: the door, the waypoint, or the man.</summary>
+    private Vector3 Anchor()
+    {
+        if (opening != null)
+        {
+            return opening.transform.position;
+        }
+
+        if (waypoint != null && target.Plan != null && waypoint.PointIndex < target.Plan.Points.Count)
+        {
+            return target.Plan.Points[waypoint.PointIndex];
+        }
+
+        return target.transform.position;
+    }
+
     /// <summary>
     ///     Rebuilt every frame so labels and enabled state track the thing the menu is open on,
-    ///     rather than freezing at the moment it opened.
+    ///     rather than freezing at the moment it opened. A reload counting up is the visible case.
     /// </summary>
     private void BuildRows()
     {
@@ -222,13 +206,14 @@ public class OperatorActionMenu : MonoBehaviour
                 // Captured by value: the struct is a data row, and the loop variable moves on.
                 var queued = verb;
 
-                rows.Add(new Row(queued.Label, openingInput != null, () =>
+                rows.Add(new ActionRow(queued.Label, openingInput != null, () =>
                 {
                     // Refused when no route reaches the opening. Say so and stay open, rather than
                     // closing on a click that did nothing.
                     if (openingInput.Queue(target, opening, queued))
                     {
                         Close();
+                        hud.Menu.Hide();
                     }
                     else
                     {
@@ -242,21 +227,21 @@ public class OperatorActionMenu : MonoBehaviour
 
         if (waypoint != null)
         {
-            rows.Add(new Row(waypoint.Run ? "RUN" : "WALK", true, () => waypoint.Run = !waypoint.Run));
-            rows.Add(new Row("CANCEL WAYPOINT", true, () =>
+            rows.Add(new ActionRow(waypoint.Run ? "RUN" : "WALK", true, () => waypoint.Run = !waypoint.Run));
+            rows.Add(new ActionRow("CANCEL WAYPOINT", true, () =>
             {
                 target.Plan.Remove(waypoint);
                 target.PathChanged();
                 Close();
+                hud.Menu.Hide();
             }));
 
             return;
         }
 
-        rows.Add(new Row(target.IsRunning ? "RUN" : "WALK", true, target.ToggleRunning));
-        rows.Add(new Row("CLEAR PATH", target.IsMoving, target.ClearPath));
-
-        rows.Add(new Row(Label(target.Engagement), true, target.CycleEngagement));
+        rows.Add(new ActionRow(target.IsRunning ? "RUN" : "WALK", true, target.ToggleRunning));
+        rows.Add(new ActionRow("CLEAR PATH", target.IsMoving, target.ClearPath));
+        rows.Add(new ActionRow(Label(target.Engagement), true, target.CycleEngagement));
 
         // Topping up before a door is the point of ordering it by hand; a dry magazine reloads
         // itself anyway.
@@ -272,7 +257,7 @@ public class OperatorActionMenu : MonoBehaviour
                     ? $"LOADED {weapon.Ammo}/{weapon.MagazineSize}"
                     : $"RELOAD {weapon.Ammo}/{weapon.MagazineSize}";
 
-            rows.Add(new Row(label, !weapon.IsReloading && !weapon.IsFull, () => weapon.BeginReload()));
+            rows.Add(new ActionRow(label, !weapon.IsReloading && !weapon.IsFull, () => weapon.BeginReload()));
         }
     }
 
@@ -285,42 +270,4 @@ public class OperatorActionMenu : MonoBehaviour
             _ => "KEEP MOVING"
         };
     }
-
-    private void Layout()
-    {
-        BuildRows();
-
-        var anchor = opening != null ? opening.transform.position
-            : waypoint != null && waypoint.PointIndex < target.Plan.Points.Count
-                ? target.Plan.Points[waypoint.PointIndex]
-                : target.transform.position;
-
-        var screen = view.WorldToScreenPoint(anchor);
-
-        // The panel is sized to what is in it. Fixing its height and dividing that between the rows
-        // made a one-verb window menu into a single slab of text with nothing that read as a button.
-        var count = Mathf.Max(1, rows.Count);
-        var height = padding + count * (rowHeight + padding);
-
-        // IMGUI measures y downward from the top; screen space measures it upward from the bottom.
-        var top = Screen.height - screen.y - gapAboveOperator - height;
-
-        panel = new Rect(screen.x - panelWidth * 0.5f, top, panelWidth, height);
-
-        var width = panelWidth - padding * 2f;
-
-        rowRects.Clear();
-
-        for (var i = 0; i < count; i++)
-        {
-            rowRects.Add(new Rect(
-                panel.x + padding,
-                panel.y + padding + i * (rowHeight + padding),
-                width,
-                rowHeight));
-        }
-    }
-
-
 }
-

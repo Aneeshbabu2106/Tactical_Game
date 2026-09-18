@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML xmlns:engine="UnityEngine.UIElements">
+
+    <engine:Style src="GameplayHud.uss" />
+
+    <!--
+        The static frame only. Anything there can be a variable number of — squad cards, action
+        rows, entry points, weapons, stat lines — is built in C# against the USS classes below,
+        because a template instantiated per item is more apparatus than a POC needs.
+
+        picking-mode=Ignore on the root and on every layout container: the panels themselves take
+        the cursor, the empty space between them does not, so the map stays clickable everywhere
+        the interface is not actually drawn. The overlay is the exception — while a menu is up it
+        covers the map deliberately, and swallowing clicks is the point of it.
+    -->
+    <engine:VisualElement name="hud-root" class="hud-root" picking-mode="Ignore">
+
+        <engine:VisualElement name="gameplay" class="gameplay" picking-mode="Ignore">
+
+            <engine:VisualElement name="mission-bar" class="panel mission-bar">
+                <engine:VisualElement name="clock-state" class="row">
+                    <engine:VisualElement name="state-dot" class="state-dot" />
+                    <engine:Label name="state-label" class="state-label" text="PAUSED" />
+                </engine:VisualElement>
+                <engine:Label name="clock" class="clock" text="0:00.0" />
+                <engine:VisualElement class="spacer" picking-mode="Ignore" />
+                <engine:VisualElement class="stat">
+                    <engine:Label name="tangos-value" class="stat-value" text="0/0" />
+                    <engine:Label class="stat-label" text="TANGOS" />
+                </engine:VisualElement>
+                <engine:VisualElement class="stat">
+                    <engine:Label name="rounds-value" class="stat-value" text="0" />
+                    <engine:Label class="stat-label" text="ROUNDS" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+
+            <engine:VisualElement name="middle" class="middle" picking-mode="Ignore">
+                <engine:VisualElement class="spacer" picking-mode="Ignore" />
+                <engine:VisualElement name="operator-panel" class="panel operator-panel">
+                    <engine:Label name="op-name" class="op-name" text="—" />
+                    <engine:Label name="op-class" class="op-class" text="" />
+
+                    <engine:Label class="field-label" text="HEALTH" />
+                    <engine:VisualElement class="meter">
+                        <engine:VisualElement name="op-health-fill" class="meter-fill health" />
+                    </engine:VisualElement>
+                    <engine:Label name="op-health-value" class="field-value" text="—" />
+
+                    <engine:Label class="field-label" text="WEAPON" />
+                    <engine:Label name="op-weapon" class="field-value" text="—" />
+
+                    <engine:VisualElement class="meter">
+                        <engine:VisualElement name="op-ammo-fill" class="meter-fill ammo" />
+                    </engine:VisualElement>
+                    <engine:Label name="op-ammo-value" class="field-value" text="—" />
+
+                    <engine:Label class="field-label" text="ENGAGEMENT" />
+                    <engine:Label name="op-engagement" class="field-value accent" text="—" />
+
+                    <engine:Label class="field-label" text="ORDER" />
+                    <engine:Label name="op-order" class="field-value" text="—" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+
+            <engine:VisualElement name="squad-bar" class="squad-bar" picking-mode="Ignore" />
+        </engine:VisualElement>
+
+        <!-- Floated to a world point by the action menu; hidden until something is clicked. -->
+        <engine:VisualElement name="action-menu" class="panel action-menu" />
+
+        <!-- Menus. Covers the map, and takes the cursor with it. -->
+        <engine:VisualElement name="overlay" class="overlay">
+
+            <!--
+                Full screen and opaque: the title screen is not a menu over the game, it is the front
+                door. The background and the key-art slot are images under UI/Art; the art is a
+                placeholder faded at its edges so a real render can replace the file in place.
+            -->
+            <engine:VisualElement name="main-menu" class="menu-screen">
+                <engine:VisualElement class="menu-title-block" picking-mode="Ignore">
+                    <engine:Label class="menu-kicker" text="BREACHPOINT · TACTICAL PROTOTYPE" />
+                    <engine:Label class="menu-title" text="TACTICORE" />
+                    <engine:VisualElement class="menu-rule" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="menu-body" picking-mode="Ignore">
+                    <engine:VisualElement name="menu-art" class="menu-art" picking-mode="Ignore" />
+
+                    <engine:VisualElement class="menu-actions" picking-mode="Ignore">
+                        <engine:Label name="menu-start" class="menu-button primary" text="START" />
+                        <engine:Label name="menu-exit" class="menu-button" text="EXIT" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+
+                <engine:Label class="menu-footer" text="POC BUILD · UNITY 6" picking-mode="Ignore" />
+            </engine:VisualElement>
+
+            <!--
+                Deployment. Two full-height panels, and the building framed into the space between
+                them by DeploymentScreen once they have been laid out. The layer itself ignores the
+                pointer, so the map in the middle stays clickable and pannable.
+            -->
+            <engine:VisualElement name="deployment" class="deploy-layer" picking-mode="Ignore">
+
+                <engine:VisualElement name="brief-panel" class="deploy-side brief-panel">
+                    <engine:VisualElement class="brief-header">
+                        <engine:Label class="side-kicker" text="MISSION BRIEF" />
+                        <engine:Label name="deploy-mission" class="side-title" text="MISSION" />
+                    </engine:VisualElement>
+                    <engine:Label name="brief-meta" class="side-meta" text="" />
+
+                    <engine:Label class="section-label" text="SITUATION" />
+                    <engine:Label name="briefing-text" class="briefing" text="" />
+
+                    <engine:Label class="section-label" text="OBJECTIVES" />
+                    <engine:VisualElement name="objective-list" class="objectives" />
+
+                    <engine:Label class="section-label" text="STAR RATING" />
+                    <engine:VisualElement name="star-list" class="stars" />
+
+                    <engine:Label class="section-label" text="INTEL" />
+                    <engine:VisualElement name="intel-list" class="intel" />
+                </engine:VisualElement>
+
+                <!-- The one control that is always there: opens the brief, or folds it away to this. -->
+                <engine:VisualElement name="brief-toggle" class="brief-toggle open">
+                    <engine:VisualElement class="bar" picking-mode="Ignore" />
+                    <engine:VisualElement class="bar" picking-mode="Ignore" />
+                    <engine:VisualElement class="bar" picking-mode="Ignore" />
+                </engine:VisualElement>
+
+                <engine:VisualElement name="recruit-panel" class="deploy-side recruit-panel">
+                    <engine:VisualElement class="recruit-header">
+                        <engine:VisualElement>
+                            <engine:Label class="side-kicker" text="TASK FORCE PAPA" />
+                            <engine:Label class="side-title" text="RECRUITS" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="deploy-count-block" class="count-block">
+                            <engine:Label name="deployed-count" class="count-value" text="0 / 0" />
+                            <engine:Label class="count-caption" text="DEPLOYED" />
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement name="deploy-pips" class="pips" />
+                    <engine:Label class="side-note"
+                                  text="Drag a recruit onto an entry marker on the map, or select him and click the marker. Drag him back here to recall." />
+
+                    <engine:VisualElement name="recruit-list" class="recruit-list" />
+
+                    <engine:VisualElement class="spacer" picking-mode="Ignore" />
+
+                    <engine:Label name="deploy-summary" class="deploy-summary" text="" />
+                    <engine:VisualElement class="deploy-actions">
+                        <engine:Label name="deploy-back" class="ui-button" text="BACK" />
+                        <engine:Label name="deploy-go" class="ui-button primary big" text="BEGIN MISSION" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+            </engine:VisualElement>
+
+            <engine:VisualElement name="results" class="panel screen">
+                <engine:Label name="result-title" class="result-title" text="—" />
+                <engine:Label name="result-stars" class="result-stars" text="" />
+                <engine:VisualElement name="result-stats" class="stat-lines" />
+                <engine:VisualElement class="row end">
+                    <engine:Label name="result-menu" class="ui-button" text="MENU" />
+                    <engine:Label name="result-retry" class="ui-button primary" text="RETRY" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

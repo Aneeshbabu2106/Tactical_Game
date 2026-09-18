@@ -1,0 +1,1292 @@
+/*
+    Tacticore gameplay HUD.
+
+    Palette is taken from what the world already draws, so the interface and the map read as one
+    thing: the operator's path cyan, the waypoint amber, the enemy red. Panels are near-black and
+    translucent rather than opaque — the map underneath is the game, and the HUD sits on it.
+
+    USS is CSS-like but not CSS: no `gap`, no `calc`, no descendant combinator in older versions.
+    Spacing is done with margins on the children for that reason.
+*/
+
+.hud-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: column;
+    -unity-font-style: bold;
+    font-size: 11px;
+    color: rgb(207, 212, 220);
+}
+
+.panel {
+    background-color: rgba(12, 13, 17, 0.95);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.09);
+    border-right-color: rgba(255, 255, 255, 0.09);
+    border-top-color: rgba(255, 255, 255, 0.09);
+    border-bottom-color: rgba(255, 255, 255, 0.09);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.row {
+    flex-direction: row;
+    align-items: center;
+}
+
+/* ---------------------------------------------------------------- mission bar */
+
+.mission-bar {
+    flex-direction: row;
+    align-items: center;
+    align-self: center;
+    margin-top: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    min-width: 420px;
+}
+
+.state-dot {
+    width: 7px;
+    height: 7px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    background-color: rgb(255, 217, 90);
+    margin-right: 6px;
+}
+
+.state-dot.running {
+    background-color: rgb(127, 212, 255);
+}
+
+.state-label {
+    color: rgb(255, 217, 90);
+    letter-spacing: 1px;
+}
+
+.state-label.running {
+    color: rgb(127, 212, 255);
+}
+
+.clock {
+    margin-left: 14px;
+    font-size: 15px;
+    color: rgb(226, 230, 236);
+}
+
+.stat {
+    align-items: flex-end;
+    margin-left: 18px;
+}
+
+.stat-value {
+    font-size: 14px;
+    color: rgb(226, 230, 236);
+}
+
+.stat-label {
+    font-size: 9px;
+    color: rgb(122, 131, 145);
+    letter-spacing: 1px;
+}
+
+/* ------------------------------------------------------------ operator panel */
+
+.middle {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+}
+
+.operator-panel {
+    width: 186px;
+    margin-right: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 9px;
+    padding-bottom: 10px;
+}
+
+.operator-panel.empty {
+    opacity: 0.35;
+}
+
+.op-name {
+    font-size: 15px;
+    color: rgb(255, 217, 90);
+    letter-spacing: 1px;
+}
+
+.op-class {
+    font-size: 9px;
+    color: rgb(122, 131, 145);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.field-label {
+    font-size: 9px;
+    color: rgb(122, 131, 145);
+    letter-spacing: 1px;
+    margin-top: 7px;
+}
+
+.field-value {
+    font-size: 12px;
+    color: rgb(214, 219, 227);
+}
+
+.field-value.accent {
+    color: rgb(255, 217, 90);
+}
+
+.meter {
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.09);
+    margin-top: 3px;
+    margin-bottom: 2px;
+}
+
+.meter-fill {
+    height: 5px;
+    width: 100%;
+}
+
+.meter-fill.health {
+    background-color: rgb(126, 205, 138);
+}
+
+.meter-fill.health.hurt {
+    background-color: rgb(255, 190, 80);
+}
+
+.meter-fill.health.critical {
+    background-color: rgb(255, 85, 85);
+}
+
+.meter-fill.ammo {
+    background-color: rgb(127, 212, 255);
+}
+
+.meter-fill.ammo.reloading {
+    background-color: rgb(255, 158, 77);
+}
+
+/* ---------------------------------------------------------------- squad bar */
+
+.squad-bar {
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.squad-card {
+    width: 168px;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-left: 9px;
+    padding-right: 9px;
+    padding-top: 7px;
+    padding-bottom: 8px;
+    background-color: rgba(12, 13, 17, 0.86);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.09);
+    border-right-color: rgba(255, 255, 255, 0.09);
+    border-top-color: rgba(255, 255, 255, 0.09);
+    border-bottom-color: rgba(255, 255, 255, 0.09);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.squad-card:hover {
+    border-left-color: rgba(255, 217, 90, 0.5);
+    border-right-color: rgba(255, 217, 90, 0.5);
+    border-top-color: rgba(255, 217, 90, 0.5);
+    border-bottom-color: rgba(255, 217, 90, 0.5);
+}
+
+.squad-card.selected {
+    border-left-color: rgb(255, 217, 90);
+    border-right-color: rgb(255, 217, 90);
+    border-top-color: rgb(255, 217, 90);
+    border-bottom-color: rgb(255, 217, 90);
+    background-color: rgba(30, 26, 14, 0.9);
+}
+
+/* A body is still on the roster; it is simply no longer an instrument. */
+.squad-card.downed {
+    opacity: 0.45;
+}
+
+.card-top {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-name {
+    font-size: 12px;
+    color: rgb(226, 230, 236);
+    letter-spacing: 1px;
+}
+
+.card-mode {
+    font-size: 9px;
+    color: rgb(255, 217, 90);
+}
+
+.card-ammo {
+    font-size: 10px;
+    color: rgb(146, 154, 167);
+    margin-top: 3px;
+}
+
+/* --------------------------------------------------------------- action menu */
+
+.action-menu {
+    /* Near-opaque, unlike the other panels. Those sit over the map deliberately; this one lands
+       wherever you clicked — often on the lit ground in front of an operator — and a menu you have
+       to read the map through is a menu you misread. */
+    background-color: rgba(10, 11, 15, 0.97);
+    position: absolute;
+    width: 168px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.action-menu .action-row {
+    height: 24px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    padding-left: 8px;
+    font-size: 11px;
+    -unity-text-align: middle-left;
+    color: rgb(214, 219, 227);
+    background-color: rgba(255, 255, 255, 0.07);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.action-menu .action-row:hover {
+    background-color: rgba(255, 217, 90, 0.18);
+    color: rgb(255, 233, 160);
+}
+
+.action-menu .action-row:disabled {
+    opacity: 0.4;
+}
+
+/* ------------------------------------------------------------------ screens */
+
+/*
+    The overlay dims the map rather than hiding it. Deployment is a decision about the building, so
+    the building should be on screen while you make it — and the results read better over the room
+    you just cleared than over a black rectangle.
+*/
+.overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+/*
+    Only the modal screens dim the map and swallow clicks. Deployment leaves it alone: the entry
+    points are markers on the building, and a full-screen overlay would eat every click aimed at
+    one.
+*/
+.overlay.dim {
+    background-color: rgba(6, 7, 10, 0.72);
+}
+
+.gameplay {
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+.screen {
+    width: 340px;
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.screen.wide {
+    width: 420px;
+}
+
+/* Beside the map rather than over it, so the building stays readable while you choose. */
+.screen.side {
+    align-self: flex-end;
+    margin-right: 26px;
+}
+
+.row.end {
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.game-title {
+    font-size: 34px;
+    color: rgb(255, 217, 90);
+    letter-spacing: 4px;
+    -unity-text-align: middle-center;
+}
+
+.game-subtitle {
+    font-size: 10px;
+    color: rgb(122, 131, 145);
+    letter-spacing: 3px;
+    -unity-text-align: middle-center;
+    margin-bottom: 22px;
+}
+
+.screen-title {
+    font-size: 20px;
+    color: rgb(255, 217, 90);
+    letter-spacing: 3px;
+}
+
+.ui-button {
+    height: 34px;
+    margin-top: 6px;
+    padding-left: 14px;
+    padding-right: 14px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    -unity-text-align: middle-center;
+    color: rgb(214, 219, 227);
+    background-color: rgba(255, 255, 255, 0.07);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.ui-button:hover {
+    background-color: rgba(255, 217, 90, 0.2);
+    color: rgb(255, 233, 160);
+}
+
+.ui-button.primary {
+    color: rgb(20, 18, 10);
+    background-color: rgb(255, 217, 90);
+}
+
+.ui-button.primary:hover {
+    background-color: rgb(255, 233, 160);
+}
+
+.row.end .ui-button {
+    margin-left: 8px;
+    min-width: 96px;
+}
+
+/* ----------------------------------------------------------------- results */
+
+.result-title {
+    font-size: 28px;
+    letter-spacing: 4px;
+    -unity-text-align: middle-center;
+    color: rgb(126, 205, 138);
+}
+
+.result-title.loss {
+    color: rgb(255, 85, 85);
+}
+
+.result-stars {
+    font-size: 20px;
+    letter-spacing: 6px;
+    -unity-text-align: middle-center;
+    color: rgb(255, 217, 90);
+    margin-top: 2px;
+    margin-bottom: 14px;
+}
+
+.stat-lines {
+    margin-top: 2px;
+}
+
+.stat-line {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.stat-line-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: rgb(122, 131, 145);
+}
+
+.stat-line-value {
+    font-size: 12px;
+    color: rgb(226, 230, 236);
+}
+
+.stat-line-value.good {
+    color: rgb(126, 205, 138);
+}
+
+.stat-line-value.bad {
+    color: rgb(255, 130, 110);
+}
+
+.briefing {
+    font-size: 11px;
+    color: rgb(178, 186, 197);
+    white-space: normal;
+    margin-bottom: 6px;
+}
+
+.objectives {
+    margin-bottom: 6px;
+}
+
+.objective {
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 5px;
+}
+
+.objective-tag {
+    width: 62px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: rgb(255, 217, 90);
+}
+
+.objective-tag.bonus {
+    color: rgb(122, 131, 145);
+}
+
+.objective-text {
+    flex-shrink: 1;
+    font-size: 11px;
+    color: rgb(206, 213, 223);
+    white-space: normal;
+}
+
+/* ------------------------------------------------------- deployment layout */
+
+/*
+    Two panels with the building between them, as the reference lays it out: what the job is on the
+    left, who is going on the right, and the map itself left clear in the middle because that is
+    what the decision is about.
+*/
+.deploy-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Full height, opaque, down each side. The building is framed into what they leave. */
+.deploy-side {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(10, 11, 15, 0.97);
+    padding-top: 18px;
+    padding-bottom: 18px;
+    padding-left: 22px;
+    padding-right: 22px;
+}
+
+.brief-panel {
+    left: 0;
+    width: 300px;
+    background-color: rgba(8, 9, 13, 0.88);
+    border-right-width: 1px;
+    border-right-color: rgba(255, 217, 90, 0.12);
+}
+
+/* Laid over the map, so every line of it gets a shadow to stay readable on lit floor. */
+.brief-panel Label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+.recruit-panel {
+    right: 0;
+    width: 350px;
+    border-left-width: 1px;
+    border-left-color: rgba(255, 217, 90, 0.22);
+}
+
+/* Room on the left for the toggle, which sits over this corner whether the panel is open or not. */
+.brief-header {
+    padding-left: 46px;
+    min-height: 36px;
+    justify-content: center;
+}
+
+.side-kicker {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgb(125, 190, 225);
+}
+
+.side-title {
+    font-size: 19px;
+    letter-spacing: 2px;
+    color: rgb(255, 217, 90);
+    white-space: normal;
+}
+
+.side-meta {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: rgb(122, 131, 145);
+    margin-top: 10px;
+}
+
+.side-note {
+    font-size: 10px;
+    color: rgb(122, 131, 145);
+    white-space: normal;
+    margin-top: 10px;
+}
+
+.section-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgb(122, 131, 145);
+    margin-top: 16px;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.star-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.star-glyph {
+    width: 20px;
+    font-size: 14px;
+    color: rgb(255, 217, 90);
+}
+
+.star-text {
+    flex-shrink: 1;
+    font-size: 11px;
+    color: rgb(214, 219, 227);
+    white-space: normal;
+}
+
+.intel {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.intel-cell {
+    width: 50%;
+    margin-top: 8px;
+}
+
+.intel-value {
+    font-size: 17px;
+    color: rgb(226, 230, 236);
+}
+
+.intel-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: rgb(122, 131, 145);
+}
+
+.brief-toggle {
+    position: absolute;
+    left: 16px;
+    top: 18px;
+    width: 36px;
+    height: 36px;
+    justify-content: space-between;
+    padding-top: 11px;
+    padding-bottom: 11px;
+    padding-left: 9px;
+    padding-right: 9px;
+    background-color: rgba(10, 11, 15, 0.97);
+    border-left-width: 1px;
+    border-left-color: rgba(255, 217, 90, 0.45);
+    border-right-width: 1px;
+    border-right-color: rgba(255, 217, 90, 0.45);
+    border-top-width: 1px;
+    border-top-color: rgba(255, 217, 90, 0.45);
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 217, 90, 0.45);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.brief-toggle:hover {
+    background-color: rgba(255, 217, 90, 0.22);
+}
+
+.brief-toggle.open {
+    background-color: rgba(255, 217, 90, 0.12);
+}
+
+.brief-toggle .bar {
+    height: 2px;
+    background-color: rgb(255, 217, 90);
+}
+
+/* ----------------------------------------------------------- recruits */
+
+.recruit-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.count-block {
+    align-items: flex-end;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgba(255, 217, 90, 0.06);
+    border-left-width: 1px;
+    border-left-color: rgba(255, 217, 90, 0.35);
+    border-right-width: 1px;
+    border-right-color: rgba(255, 217, 90, 0.35);
+    border-top-width: 1px;
+    border-top-color: rgba(255, 217, 90, 0.35);
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 217, 90, 0.35);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    transition-property: background-color;
+    transition-duration: 0.15s;
+}
+
+.count-block.refused {
+    background-color: rgba(255, 96, 80, 0.35);
+    border-left-color: rgb(255, 96, 80);
+    border-right-color: rgb(255, 96, 80);
+    border-top-color: rgb(255, 96, 80);
+    border-bottom-color: rgb(255, 96, 80);
+}
+
+.count-value {
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: rgb(255, 217, 90);
+    -unity-text-align: middle-right;
+}
+
+.count-caption {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: rgb(122, 131, 145);
+}
+
+.pips {
+    flex-direction: row;
+    margin-top: 12px;
+}
+
+.pip {
+    flex-grow: 1;
+    height: 4px;
+    margin-right: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.pip.filled {
+    background-color: rgb(255, 217, 90);
+}
+
+.recruit-list {
+    margin-top: 6px;
+}
+
+/* Selected: a click on a marker sends him. */
+.op-card {
+    flex-direction: row;
+    flex-shrink: 0;
+    height: 114px;
+    margin-top: 6px;
+    background-image: url("Art/Card/CardFill.png");
+    -unity-slice-left: 14;
+    -unity-slice-right: 14;
+    -unity-slice-top: 14;
+    -unity-slice-bottom: 14;
+    -unity-slice-scale: 0.7px;
+    transition-property: translate, opacity;
+    transition-duration: 0.12s;
+}
+
+/* Labels carry default margins and padding that swell rows of text this small; the card sets its own. */
+.op-card Label {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.op-card:hover {
+    translate: -3px 0;
+}
+
+.op-card.dragging {
+    opacity: 0.4;
+}
+
+.op-frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("Art/Card/CardFrame.png");
+    -unity-slice-left: 34;
+    -unity-slice-right: 34;
+    -unity-slice-top: 34;
+    -unity-slice-bottom: 34;
+    -unity-slice-scale: 0.7px;
+}
+
+.op-portrait {
+    width: 78px;
+    margin-left: 2px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    background-color: rgba(255, 255, 255, 0.03);
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.op-portrait-edge {
+    position: absolute;
+    right: -7px;
+    top: 0;
+    bottom: 0;
+    width: 15px;
+    background-image: url("Art/Card/PortraitEdge.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.op-badge {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 22px;
+    padding-right: 4px;
+    justify-content: center;
+    background-image: url("Art/Card/BadgeCut.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.op-badge-number {
+    font-size: 12px;
+    color: rgb(12, 12, 14);
+    -unity-text-align: middle-center;
+}
+
+.op-body {
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding-left: 11px;
+    padding-right: 14px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.op-head {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.op-emblem {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    margin-right: 6px;
+    background-image: url("Art/Card/Emblem.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.op-titles {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.op-callsign {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: rgb(238, 241, 246);
+}
+
+.op-role {
+    margin-top: 1px;
+    font-size: 7px;
+    letter-spacing: 1px;
+    color: rgb(165, 174, 188);
+}
+
+.op-tag {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 6px;
+    padding-right: 7px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-left-width: 1px;
+    border-left-color: rgb(255, 217, 90);
+    border-right-width: 1px;
+    border-right-color: rgb(255, 217, 90);
+    border-top-width: 1px;
+    border-top-color: rgb(255, 217, 90);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(255, 217, 90);
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.op-tag:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.op-tag.standby {
+    opacity: 0.6;
+}
+
+.op-tag-diamond {
+    width: 6px;
+    height: 6px;
+    margin-right: 4px;
+    background-image: url("Art/Card/Diamond.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.op-tag-text {
+    font-size: 7px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.op-rule {
+    flex-shrink: 0;
+    height: 1px;
+    margin-top: 6px;
+    margin-bottom: 5px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.op-stats {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+}
+
+.op-stat {
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: row;
+    align-items: center;
+}
+
+.op-stat-icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 4px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.icon-heart {
+    background-image: url("Art/Icons/Heart.png");
+}
+
+.icon-shield {
+    background-image: url("Art/Icons/Shield.png");
+}
+
+.icon-crosshair {
+    background-image: url("Art/Icons/Crosshair.png");
+}
+
+.op-stat-col {
+    flex-grow: 1;
+}
+
+.op-stat-label {
+    font-size: 6px;
+    letter-spacing: 1px;
+    color: rgb(140, 150, 165);
+}
+
+.op-stat-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.op-stat-value {
+    width: 18px;
+    font-size: 9px;
+    color: rgb(238, 241, 246);
+}
+
+.op-bar {
+    flex-grow: 1;
+    height: 2px;
+    margin-right: 5px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    border-bottom-left-radius: 1px;
+    border-bottom-right-radius: 1px;
+}
+
+.op-bar-fill {
+    height: 2px;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    border-bottom-left-radius: 1px;
+    border-bottom-right-radius: 1px;
+}
+
+.op-divider {
+    width: 1px;
+    height: 16px;
+    margin-right: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.op-slots {
+    flex-direction: row;
+    flex-shrink: 0;
+    height: 30px;
+}
+
+.op-slot {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: 3px;
+    background-image: url("Art/Card/SlotFill.png");
+    -unity-slice-left: 8;
+    -unity-slice-right: 8;
+    -unity-slice-top: 8;
+    -unity-slice-bottom: 8;
+    -unity-slice-scale: 0.7px;
+}
+
+.op-slot.wide {
+    flex-grow: 1.7;
+}
+
+.op-slot-icon {
+    position: absolute;
+    left: 5px;
+    right: 3px;
+    top: 3px;
+    bottom: 3px;
+    align-items: center;
+    justify-content: center;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgb(212, 217, 225);
+}
+
+.op-slot-name {
+    font-size: 5px;
+    letter-spacing: 1px;
+    color: rgb(140, 150, 165);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.op-slot-frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("Art/Card/SlotFrame.png");
+    -unity-slice-left: 10;
+    -unity-slice-right: 10;
+    -unity-slice-top: 10;
+    -unity-slice-bottom: 10;
+    -unity-slice-scale: 0.7px;
+}
+
+.op-slot-tab {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    background-image: url("Art/Card/SlotTab.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.op-slot-number {
+    position: absolute;
+    left: 1px;
+    top: -2px;
+    font-size: 5px;
+    color: rgb(12, 12, 14);
+}
+
+.op-slot-ammo {
+    position: absolute;
+    left: 4px;
+    bottom: 2px;
+    width: 12px;
+    height: 5px;
+    background-image: url("Art/Icons/Ammo.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.drag-ghost {
+    position: absolute;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgba(10, 11, 15, 0.94);
+    border-left-width: 1px;
+    border-left-color: rgb(255, 217, 90);
+    border-right-width: 1px;
+    border-right-color: rgb(255, 217, 90);
+    border-top-width: 1px;
+    border-top-color: rgb(255, 217, 90);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(255, 217, 90);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.drag-ghost.on-target {
+    border-left-color: rgb(127, 212, 255);
+    border-right-color: rgb(127, 212, 255);
+    border-top-color: rgb(127, 212, 255);
+    border-bottom-color: rgb(127, 212, 255);
+}
+
+.drag-ghost.recall {
+    border-left-color: rgb(255, 140, 120);
+    border-right-color: rgb(255, 140, 120);
+    border-top-color: rgb(255, 140, 120);
+    border-bottom-color: rgb(255, 140, 120);
+}
+
+.drag-ghost-badge {
+    margin-right: 8px;
+    font-size: 14px;
+    color: rgb(255, 217, 90);
+}
+
+.drag-ghost-target {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: rgb(170, 178, 190);
+}
+
+.drag-ghost.on-target .drag-ghost-target {
+    color: rgb(127, 212, 255);
+}
+
+.deploy-summary {
+    margin-bottom: 8px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: rgb(170, 178, 190);
+    white-space: normal;
+}
+
+.deploy-actions {
+    flex-direction: row;
+    align-items: center;
+}
+
+.deploy-actions .ui-button {
+    margin-top: 0;
+    margin-right: 8px;
+    height: 44px;
+}
+
+.deploy-actions .ui-button.big {
+    flex-grow: 1;
+    margin-right: 0;
+    font-size: 14px;
+    letter-spacing: 3px;
+}
+
+.ui-button.primary:disabled {
+    color: rgba(20, 18, 10, 0.6);
+    background-color: rgba(255, 217, 90, 0.25);
+}
+
+/* ---------------------------------------------------------------- title screen */
+
+.menu-screen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(8, 9, 12);
+    background-image: url("Art/MenuBackground.png");
+    -unity-background-scale-mode: scale-and-crop;
+    padding-left: 48px;
+    padding-right: 72px;
+    padding-top: 44px;
+    padding-bottom: 28px;
+}
+
+.menu-title-block {
+    align-items: center;
+}
+
+.menu-kicker {
+    font-size: 13px;
+    letter-spacing: 8px;
+    color: rgb(125, 190, 225);
+    -unity-text-align: middle-center;
+}
+
+.menu-title {
+    font-size: 104px;
+    letter-spacing: 18px;
+    color: rgb(255, 217, 90);
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(90, 60, 0, 0.6);
+    text-shadow: 0 6px 18px rgba(0, 0, 0, 0.8);
+    margin-top: -6px;
+}
+
+.menu-rule {
+    width: 420px;
+    height: 2px;
+    margin-top: 2px;
+    background-color: rgba(255, 217, 90, 0.55);
+}
+
+.menu-body {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+/* No frame and no fill: the image carries its own fade, so the slot melts into the backdrop. */
+.menu-art {
+    flex-grow: 1;
+    margin-left: -48px;
+    margin-bottom: -28px;
+    background-image: url("Art/MenuKeyArt_Placeholder.png");
+    -unity-background-scale-mode: scale-to-fit;
+    background-position-x: left 0;
+    background-position-y: bottom 0;
+}
+
+.menu-actions {
+    width: 320px;
+    justify-content: center;
+    padding-bottom: 40px;
+}
+
+.menu-button {
+    height: 66px;
+    margin-top: 14px;
+    padding-left: 26px;
+    font-size: 24px;
+    letter-spacing: 8px;
+    -unity-text-align: middle-left;
+    color: rgb(214, 219, 227);
+    background-color: rgba(10, 12, 16, 0.78);
+    border-left-width: 4px;
+    border-left-color: rgba(255, 255, 255, 0.25);
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-right-color: rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(255, 255, 255, 0.08);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    transition-property: translate, background-color, color;
+    transition-duration: 0.12s;
+}
+
+.menu-button:hover {
+    translate: -8px 0;
+    color: rgb(255, 233, 160);
+    background-color: rgba(255, 217, 90, 0.16);
+    border-left-color: rgb(255, 217, 90);
+}
+
+.menu-button.primary {
+    color: rgb(20, 18, 10);
+    background-color: rgb(255, 217, 90);
+    border-left-color: rgb(255, 245, 200);
+}
+
+.menu-button.primary:hover {
+    color: rgb(20, 18, 10);
+    background-color: rgb(255, 233, 160);
+}
+
+.menu-footer {
+    position: absolute;
+    right: 72px;
+    bottom: 22px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(150, 160, 175, 0.55);
+}

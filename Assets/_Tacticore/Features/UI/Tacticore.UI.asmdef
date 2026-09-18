@@ -3,12 +3,17 @@
     "rootNamespace": "",
     "references": [
         "Tacticore.Core",
+        "Tacticore.Data",
         "Tacticore.Grid",
         "Tacticore.Paths",
         "Tacticore.Operators",
         "Tacticore.Tools",
         "Tacticore.Input",
-        "Tacticore.Combat"
+        "Tacticore.Combat",
+        "Tacticore.Enemies",
+        "Tacticore.Vision",
+        "Tacticore.Mission",
+        "Tacticore.Camera"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
